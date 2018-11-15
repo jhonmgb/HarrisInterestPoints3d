@@ -6,11 +6,15 @@
  */
 Vertex::Vertex()
 {
-    this->index = 0;
+    this->index = new (nothrow) int(0);
+    this->coordinates =  new (nothrow) double[3] ;
+
     for (int i=0; i<3; i++)
     {
-       *(this->coordinates +i ) = 0;
+       *(coordinates +i ) = 0;
     }
+
+    facesContainingPoint = new vector<int>;
 }
 
 /**
@@ -19,13 +23,24 @@ Vertex::Vertex()
  * @param newIndex :  The index of the created Vertex
  * @param newCoordinates :  The 3D coordinates of the Vertex
  */
-Vertex::Vertex(int newIndex, double* newCoordinates )
+Vertex::Vertex(int newIndex, double* newCoordinates, int numberOfFaces)
 {
-    this->index = newIndex;
-    for(int i = 0; i < 3 ; i++)
+    index = new (nothrow) int(newIndex);
+    coordinates =  new (nothrow) double[3] ;
+
+    if (coordinates == nullptr)
     {
-        this->coordinates[i] = *(newCoordinates + i);
+        cout << "Error: memory could not be allocated";
     }
+    else
+    {
+        for (int i=0; i<3; i++)
+        {
+           *(coordinates +i ) = *(newCoordinates + i);
+        }
+    }
+
+    facesContainingPoint = new vector<int>;
 }
 
 /**
@@ -34,8 +49,9 @@ Vertex::Vertex(int newIndex, double* newCoordinates )
  */
 Vertex::~Vertex()
 {
-    delete[] this->coordinates;
-    this->facesContainingPoint.clear();
+    delete index;
+    delete[] coordinates;
+    delete facesContainingPoint;
 }
 
 /**
@@ -46,11 +62,11 @@ Vertex::~Vertex()
 void Vertex::addNewFace(int faceNumber)
 {
     vector<int>::iterator it;
-    it = find ( facesContainingPoint.begin(), facesContainingPoint.end(), faceNumber);
-    if(it == facesContainingPoint.end() )
+    it = find ( (*facesContainingPoint).begin(), (*facesContainingPoint).end(), faceNumber);
+    if(it == (*facesContainingPoint).end() )
     {
         //Element not found in facesContainingPoint
-        this->facesContainingPoint.push_back(faceNumber);
+        (*facesContainingPoint).push_back(faceNumber);
     }
 }
 
@@ -62,25 +78,42 @@ void Vertex::addNewFace(int faceNumber)
 void Vertex::deleteFace(int faceNumber)
 {
     vector<int>::iterator it;
-    it = find ( facesContainingPoint.begin(),
-                        facesContainingPoint.end(), faceNumber );
-    if( it != facesContainingPoint.end() )
+    it = find ( ( *facesContainingPoint ).begin(),
+                ( *facesContainingPoint ).end(),
+                faceNumber );
+
+    if( it != ( *facesContainingPoint ).end() )
     {
         //Element found in facesContainingPoint
-        this->facesContainingPoint.erase(it);
+        ( * facesContainingPoint ).erase(it);
     }
 }
 
 /**
- * @brief Vertex::setCordinates
+ * @brief Vertex::setCoordinates
  * This method writes the position of the given coordinates of the vereteex
  * @param newCoordinates: are the cooridnates value in X Y Z
  */
-void Vertex::setCordinates(double* newCoordinates)
+void Vertex::setCoordinates(double* newCoordinates)
 {
-    for(int i=1; i<3 ; i++)
+    for(int i = 0; i<3 ; i++)
     {
-        this->coordinates[i] = *(newCoordinates + 1);
+        this->coordinates[i] = *(newCoordinates + i);
+    }
+}
+
+
+/**
+ * @brief Vertex::setCoordinates
+ * This method writes the position of the given coordinates of the vereteex
+ * @param newCoordinates: are the cooridnates value in X Y Z
+ */
+void Vertex::setCoordinates(double x, double y , double z)
+{
+    double newCoordinates[3] = { x, y, z};
+    for(int i = 0; i<3 ; i++)
+    {
+        this->coordinates[i] = *(newCoordinates + i);
     }
 }
 
@@ -91,7 +124,7 @@ void Vertex::setCordinates(double* newCoordinates)
  */
 void Vertex::setIndex(int newIndex)
 {
-    this->index=newIndex;
+    *index=newIndex;
 }
 
 /**
@@ -100,7 +133,7 @@ void Vertex::setIndex(int newIndex)
  */
 int Vertex::getIndex()
 {
-    return this->index;
+    return *(this->index);
 }
 
 /**
@@ -118,5 +151,5 @@ double* Vertex::getCoordinates()
  */
 vector<int> Vertex::getFaces()
 {
-    return this->facesContainingPoint;
+    return *(this->facesContainingPoint);
 }

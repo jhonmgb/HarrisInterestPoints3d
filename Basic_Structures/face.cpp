@@ -6,10 +6,18 @@
  */
 Face::Face()
 {
-    this->faceIndex = 0;
-    for (int i=0; i<3; i++)
+    faceIndex = new (nothrow) int(0) ;
+    pointsInFace = new (nothrow) int[3] ;
+    if (pointsInFace == nullptr)
     {
-       *(this->pointsInFace +i ) = 0;
+        cout << "Error: memory could not be allocated";
+    }
+    else
+    {
+        for (int i=0; i<3; i++)
+        {
+           *(this->pointsInFace +i ) = 0;
+        }
     }
 }
 
@@ -19,12 +27,20 @@ Face::Face()
  * @param newIndex :  The index of the created Face
  * @param newCoordinates :  The Face indexes coordinates of the Face
  */
-Face::Face(int newIndex, double* newCoordinates )
+Face::Face(int newIndex, int* newPoints )
 {
-    this->faceIndex = newIndex;
-    for(int i=1; i<3 ; i++)
+    faceIndex = new (nothrow) int(newIndex) ;
+    pointsInFace = new (nothrow) int[3] ;
+    if (pointsInFace == nullptr)
     {
-        this->pointsInFace[i] = *(newCoordinates + 1);
+        cout << "Error: memory could not be allocated";
+    }
+    else
+    {
+        for (int i=0; i<3; i++)
+        {
+           *(pointsInFace +i ) = *(newPoints + i);
+        }
     }
 }
 
@@ -34,6 +50,7 @@ Face::Face(int newIndex, double* newCoordinates )
  */
 Face::~Face()
 {
+    delete faceIndex;
     delete[] this->pointsInFace;
 }
 
@@ -44,9 +61,25 @@ Face::~Face()
  */
 void Face::setPointsInFace(int *newPoints)
 {
-    for(int i=1; i<3 ; i++)
+    for( int i = 0 ; i < 3 ; i++ )
     {
-        *(this->pointsInFace+i) = *(newPoints + 1);
+        *( pointsInFace + i ) = *( newPoints + i );
+    }
+}
+
+/**
+ * @brief setPointsInFace
+ * This method writes the indexes of the points inlcuded in the face
+ * @param point1: index of point N1
+ * @param point2: index of point N2
+ * @param point3: index of point N2
+ */
+void Face::setPointsInFace( int point1, int point2, int point3)
+{
+    int newPoints[3] = { point1 , point2 , point3 };
+    for( int i = 0 ; i < 3 ; i++ )
+    {
+        *( pointsInFace + i ) = *( newPoints + i );
     }
 }
 
@@ -57,7 +90,7 @@ void Face::setPointsInFace(int *newPoints)
  */
 void Face::setFaceIndex(int newIndex)
 {
-    this->faceIndex=newIndex;
+    *faceIndex = newIndex;
 }
 
 /**
@@ -66,7 +99,7 @@ void Face::setFaceIndex(int newIndex)
  */
 int Face::getFaceIndex()
 {
-    return this->faceIndex;
+    return *faceIndex;
 }
 
 /**
@@ -77,5 +110,3 @@ int* Face::getPointsInFace()
 {
     return this->pointsInFace;
 }
-
-

@@ -8,10 +8,8 @@
  */
 Mesh::Mesh(int vertexNumber, int facesNumber)
 {
-    vector<Vertex> tempVertex(vertexNumber);
-    this-> vertexes = tempVertex;
-    vector<Face> tempFaces(facesNumber);
-    this-> faces = tempFaces;
+    vertexes = new vector<Vertex>(vertexNumber);
+    faces = new vector<Face>(facesNumber);
 }
 
 /**
@@ -19,8 +17,8 @@ Mesh::Mesh(int vertexNumber, int facesNumber)
  */
 Mesh::~Mesh()
 {
-    this->faces.clear();
-    this->vertexes.clear();
+    delete faces;
+    delete vertexes;
 }
 
 /**
@@ -30,7 +28,11 @@ Mesh::~Mesh()
  */
 void Mesh::setVertex(Vertex newVertex , int position)
 {
-    this->vertexes.at(position)=newVertex;
+    if( (unsigned int)position < vertexes->size())
+    {
+        ( *vertexes).at(position)=newVertex;
+    }
+
 }
 
 /**
@@ -39,7 +41,7 @@ void Mesh::setVertex(Vertex newVertex , int position)
  */
 void Mesh::addNewVertex(Vertex newVertex)
 {
-    this->vertexes.push_back(newVertex);
+    ( *vertexes).push_back(newVertex);
 }
 
 /**
@@ -49,7 +51,10 @@ void Mesh::addNewVertex(Vertex newVertex)
  */
 void Mesh::setFace(Face newFace, int position)
 {
-    this->faces.at(position)=newFace;
+    if( (unsigned int)position < faces->size())
+    {
+        ( *faces).at(position)=newFace;
+    }
 }
 
 
@@ -59,8 +64,47 @@ void Mesh::setFace(Face newFace, int position)
  */
 void Mesh::addNewFace(Face newFace)
 {
-    this->faces.push_back(newFace);
+    ( *faces).push_back(newFace);
+}
+
+
+/**
+ * @brief getAllFaces : Return a vector of all the Faces in the mesh
+ * @return
+ */
+vector<Face> Mesh::getAllFaces()
+{
+    return *faces;
 }
 
 
 
+/**
+ * @brief getAllVertexes: Return a vector of all the vertex in the mesh
+ * @return
+ */
+vector<Vertex>  Mesh::getAllVertexes()
+{
+    return *vertexes;
+}
+
+
+/**
+ * @brief getFace:  Returns the face on a given position
+ * @param position
+ * @return
+ */
+Face  Mesh::getFace(int position)
+{
+    return (*faces).at(position);
+}
+
+/**
+ * @brief getFace:  Returns the face on a given position
+ * @param position
+ * @return
+ */
+Vertex Mesh::getVertex(int position)
+{
+    return (*vertexes).at(position);
+}

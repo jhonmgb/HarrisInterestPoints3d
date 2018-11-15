@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <new>
 #include "face.h"
 #include "vertex.h"
 
@@ -15,12 +16,12 @@ class Mesh
         /**
          * @brief faces:  It is the vector of faces contained in the mesh
          */
-        vector<Face> faces;
+        vector<Face> * faces;
 
         /**
          * @brief vertexes:  It is the vector of vertexes contained in the mesh
          */
-        vector<Vertex> vertexes;
+        vector<Vertex> * vertexes;
 
     public:
 
@@ -62,6 +63,33 @@ class Mesh
          * @param newVertex: The new face to include in the mesh
          */
         void addNewFace(Face newFace);
+
+        /**
+         * @brief getAllFaces : Return a vector of all the Faces in the mesh
+         * @return
+         */
+        vector<Face> getAllFaces();
+
+        /**
+         * @brief getAllVertexes: Return a vector of all the vertex in the mesh
+         * @return
+         */
+        vector<Vertex>  getAllVertexes();
+
+        /**
+         * @brief getFace:  Returns the face on a given position
+         * @param position
+         * @return
+         */
+        Face getFace(int position);
+
+        /**
+         * @brief getVertex: Returns a vertex in a given position
+         * @param position
+         * @return
+         */
+        Vertex getVertex(int position);
+
 
 };
 

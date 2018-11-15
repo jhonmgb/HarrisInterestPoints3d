@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <new>
 
 using namespace std;
 
@@ -13,17 +14,17 @@ class Vertex
         /**
          * @brief index: Index asociated to the point
          */
-        int index;
+        int * index;
 
         /**
          * @brief coordinates: (X Y Z) coordinates
          */
-        double coordinates[3];
+        double * coordinates;
 
         /**
          * @brief facesContainingPoint: Faces that contains the point
          */
-        vector<int> facesContainingPoint;
+        vector<int> * facesContainingPoint;
 
     public:
 
@@ -39,7 +40,7 @@ class Vertex
          * @param newIndex :  The index of the created Vertex
          * @param newCoordinates :  The 3D coordinates of the Vertex
          */
-        Vertex(int newIndex, double* newCoordinates );
+        Vertex(int newIndex, double* newCoordinates , int numberOfFaces);
 
         /**
          * @brief ~Vertex
@@ -62,11 +63,21 @@ class Vertex
         void deleteFace(int faceNumber);
 
         /**
-         * @brief setCordinates
+         * @brief setCoordinates
          * This method writes the position of the given coordinates of the vereteex
+         * by a given array
          * @param newCoordinates: are the cooridnates value in X Y Z
          */
-        void setCordinates(double* newCoordinates);
+        void setCoordinates(double* newCoordinates);
+
+        /** @brief setCoordinates
+         * This method writes the position of the given coordinates X Y Z of the vereteex
+         * @param newCoordinates: are the cooridnates value in X Y Z
+         * @param x: Coordinate value in X
+         * @param y: Coordinate value in Y
+         * @param z: Coordinate value in Z
+         */
+        void setCoordinates(double x, double y , double z);
 
         /**
          * @brief setIndex

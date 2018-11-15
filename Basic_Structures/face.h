@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <new>
 
 using namespace std;
 
@@ -13,12 +14,12 @@ class Face
         /**
          * @brief faceIndex : Index asociated to the face
          */
-        int faceIndex;
+        int* faceIndex;
 
         /**
-         * @brief pointsInFace: points asociated to trianglular faces
+         * @brief pointsInFace: 3 points asociated to trianglular faces
          */
-        int pointsInFace[3];
+        int* pointsInFace;
 
     public:
 
@@ -34,7 +35,7 @@ class Face
          * @param newIndex :  The index of the created Face
          * @param newCoordinates :  The Face indexes coordinates of the Face
          */
-        Face(int newIndex, double* newCoordinates );
+        Face(int newIndex, int *newPoints );
 
         /**
          * @brief ~Face
@@ -48,6 +49,15 @@ class Face
          * @param newPoints: are the tree points corresponding to the face
          */
         void setPointsInFace(int* newPoints);
+
+        /**
+         * @brief setPointsInFace
+         * This method writes the indexes of the points inlcuded in the face
+         * @param point1: index of point N1
+         * @param point2: index of point N2
+         * @param point3: index of point N2
+         */
+        void setPointsInFace( int point1, int point2, int point3);
 
         /**
          * @brief Face::setFaceIndex
@@ -67,12 +77,6 @@ class Face
          * @return a pointer type int to the object pointsInFace
          */
         int* getPointsInFace();
-
-
 };
-
-
-
-
 
 #endif // FACE_H
