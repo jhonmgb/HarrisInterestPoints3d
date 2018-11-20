@@ -14,7 +14,7 @@ class Face
         /**
          * @brief faceIndex : Index asociated to the face
          */
-        int* faceIndex;
+        int faceIndex;
 
         /**
          * @brief pointsInFace: 3 points asociated to trianglular faces
@@ -25,7 +25,7 @@ class Face
 
         /**
          * @brief Face
-         *  This method construct a Face class without defining its private objects
+         *  This method constructs a Face class without defining its private objects
          */
         Face();
 
@@ -33,7 +33,7 @@ class Face
          * @brief Face
          * This method construct a Face class defining the following objects
          * @param newIndex :  The index of the created Face
-         * @param newCoordinates :  The Face indexes coordinates of the Face
+         * @param newPoints :  The Face indexes coordinates of the Face
          */
         Face(int newIndex, int *newPoints );
 

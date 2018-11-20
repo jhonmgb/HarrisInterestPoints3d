@@ -6,7 +6,7 @@
  */
 Face::Face()
 {
-    faceIndex = new (nothrow) int(0) ;
+    faceIndex = 0 ;
     pointsInFace = new (nothrow) int[3] ;
     if (pointsInFace == nullptr)
     {
@@ -29,7 +29,7 @@ Face::Face()
  */
 Face::Face(int newIndex, int* newPoints )
 {
-    faceIndex = new (nothrow) int(newIndex) ;
+    faceIndex = newIndex ;
     pointsInFace = new (nothrow) int[3] ;
     if (pointsInFace == nullptr)
     {
@@ -50,7 +50,6 @@ Face::Face(int newIndex, int* newPoints )
  */
 Face::~Face()
 {
-    delete faceIndex;
     delete[] this->pointsInFace;
 }
 
@@ -90,7 +89,7 @@ void Face::setPointsInFace( int point1, int point2, int point3)
  */
 void Face::setFaceIndex(int newIndex)
 {
-    *faceIndex = newIndex;
+    faceIndex = newIndex;
 }
 
 /**
@@ -99,7 +98,7 @@ void Face::setFaceIndex(int newIndex)
  */
 int Face::getFaceIndex()
 {
-    return *faceIndex;
+    return faceIndex;
 }
 
 /**
