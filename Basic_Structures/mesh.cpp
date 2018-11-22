@@ -1,7 +1,5 @@
 #include "mesh.h"
 
-
-
 /**
  * @brief Mesh::Mesh : Construct a mesh class with the number of
  *                     vertex and faces
@@ -59,7 +57,6 @@ void Mesh::setFace(Face * newFace, int position)
     }
 }
 
-
 /**
  * @brief Mesh::addNewVertex: Add a new face at the end of the mesh
  * @param newVertex: The new face to include in the mesh
@@ -68,7 +65,6 @@ void Mesh::addNewFace(Face * newFace)
 {
     faces->push_back(newFace);
 }
-
 
 /**
  * @brief getAllFaces : Return a vector of all the Faces in the mesh
@@ -79,8 +75,6 @@ vector<Face *> * Mesh::getAllFaces()
     return faces;
 }
 
-
-
 /**
  * @brief getAllVertexes: Return a vector of all the vertex in the mesh
  * @return
@@ -89,7 +83,6 @@ vector<Vertex * > *  Mesh::getAllVertexes()
 {
     return vertexes;
 }
-
 
 /**
  * @brief getFace:  Returns the face on a given position
