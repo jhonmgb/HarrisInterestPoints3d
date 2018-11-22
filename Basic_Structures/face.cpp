@@ -4,10 +4,11 @@
  * @brief Face::Face
  *  This method construct a Face class without defining its private objects
  */
+ 
 Face::Face()
 {
-    faceIndex = new (nothrow) int(0) ;
-    pointsInFace = new (nothrow) int[3] ;
+    faceIndex = 0 ;
+    pointsInFace = new (nothrow) int[3];
     if (pointsInFace == nullptr)
     {
         cout << "Error: memory could not be allocated";
@@ -27,10 +28,10 @@ Face::Face()
  * @param newIndex :  The index of the created Face
  * @param newCoordinates :  The Face indexes coordinates of the Face
  */
-Face::Face(int newIndex, int* newPoints )
+Face::Face(int newIndex, int* newPoints)
 {
-    faceIndex = new (nothrow) int(newIndex) ;
-    pointsInFace = new (nothrow) int[3] ;
+    faceIndex = newIndex ;
+    pointsInFace = new (nothrow) int[3];
     if (pointsInFace == nullptr)
     {
         cout << "Error: memory could not be allocated";
@@ -50,7 +51,6 @@ Face::Face(int newIndex, int* newPoints )
  */
 Face::~Face()
 {
-    delete faceIndex;
     delete[] this->pointsInFace;
 }
 
@@ -90,7 +90,7 @@ void Face::setPointsInFace( int point1, int point2, int point3)
  */
 void Face::setFaceIndex(int newIndex)
 {
-    *faceIndex = newIndex;
+    faceIndex = newIndex;
 }
 
 /**
@@ -99,7 +99,7 @@ void Face::setFaceIndex(int newIndex)
  */
 int Face::getFaceIndex()
 {
-    return *faceIndex;
+    return faceIndex;
 }
 
 /**

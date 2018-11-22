@@ -14,24 +14,21 @@ class Mesh
 {
     private:
         /**
-         * @brief faces:  It is the vector of faces contained in the mesh
+         * @brief faces:  It is a pointer to the vector of pointers to faces contained in the mesh
          */
-        vector<Face> * faces;
+        vector<Face *> * faces;
 
         /**
-         * @brief vertexes:  It is the vector of vertexes contained in the mesh
+         * @brief vertexes:  It is a pointer to the vector of pointers to vertexes contained in the mesh
          */
-        vector<Vertex> * vertexes;
+        vector<Vertex *> * vertexes;
 
     public:
 
         /**
-         * @brief Mesh : Construct a mesh class with the number of
-         *                     vertex and faces
-         * @param vertexNumber :  number of vertex of the mesh
-         * @param facesNumber  :  number of faces of the mesh
+         * @brief Mesh : Construct a mesh class
          */
-        Mesh(int vertexNumber, int facesNumber);
+        Mesh();
 
         /**
          * @brief ~Mesh: Destructs the Mesh objects, clear the vectors
@@ -40,55 +37,55 @@ class Mesh
 
         /**
          * @brief setVertex: Defines a vertex inside the Mesh
-         * @param newVertex: The vertex to include
+         * @param newVertex: A pointer to the vertex to include
          * @param position:  Position to include the vertex
          */
-        void setVertex(Vertex newVertex , int position);
+        void setVertex(Vertex * newVertex , int position);
 
         /**
          * @brief addNewVertex: Add a new vertex at the end of the mesh
-         * @param newVertex: The new vertex to include in the mesh
+         * @param newVertex: A pointer to the new vertex to include in the mesh
          */
-        void addNewVertex(Vertex newVertex);
+        void addNewVertex(Vertex * newVertex);
 
         /**
          * @brief setFace: Defines a face inside the Mesh
-         * @param newFace: The face to include
+         * @param newFace: A pointer to the face to include
          * @param position:  Position to include the face
          */
-        void setFace(Face newFace, int position);
+        void setFace(Face * newFace, int position);
 
         /**
-         * @brief addNewVertex: Add a new face at the end of the mesh
-         * @param newVertex: The new face to include in the mesh
+         * @brief addNewFace: Add a new face at the end of the mesh
+         * @param newFace: Pointer to the new face to include in the mesh
          */
-        void addNewFace(Face newFace);
+        void addNewFace(Face * newFace);
 
         /**
-         * @brief getAllFaces : Return a vector of all the Faces in the mesh
+         * @brief getAllFaces : Return a pointer to a vector of pointers to all the Faces in the mesh
          * @return
          */
-        vector<Face> getAllFaces();
+        vector<Face * > * getAllFaces();
 
         /**
-         * @brief getAllVertexes: Return a vector of all the vertex in the mesh
+         * @brief getAllVertexes: Returns a pointer to a vector of pointers to all the vertex in the mesh
          * @return
          */
-        vector<Vertex>  getAllVertexes();
+        vector<Vertex *> * getAllVertexes();
 
         /**
-         * @brief getFace:  Returns the face on a given position
+         * @brief getFace:  Returns a pointer to the face on a given position
          * @param position
          * @return
          */
-        Face getFace(int position);
+        Face * getFace(int position);
 
         /**
-         * @brief getVertex: Returns a vertex in a given position
+         * @brief getVertex: Returns a pointer to a vertex in a given position
          * @param position
          * @return
          */
-        Vertex getVertex(int position);
+        Vertex * getVertex(int position);
 
 
 };

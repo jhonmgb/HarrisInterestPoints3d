@@ -6,7 +6,7 @@
  */
 Vertex::Vertex()
 {
-    this->index = new (nothrow) int(0);
+    index = 0;
     this->coordinates =  new (nothrow) double[3] ;
 
     for (int i=0; i<3; i++)
@@ -23,9 +23,9 @@ Vertex::Vertex()
  * @param newIndex :  The index of the created Vertex
  * @param newCoordinates :  The 3D coordinates of the Vertex
  */
-Vertex::Vertex(int newIndex, double* newCoordinates, int numberOfFaces)
+Vertex::Vertex(int newIndex, double* newCoordinates)
 {
-    index = new (nothrow) int(newIndex);
+    index = newIndex;
     coordinates =  new (nothrow) double[3] ;
 
     if (coordinates == nullptr)
@@ -49,7 +49,6 @@ Vertex::Vertex(int newIndex, double* newCoordinates, int numberOfFaces)
  */
 Vertex::~Vertex()
 {
-    delete index;
     delete[] coordinates;
     delete facesContainingPoint;
 }
@@ -124,7 +123,7 @@ void Vertex::setCoordinates(double x, double y , double z)
  */
 void Vertex::setIndex(int newIndex)
 {
-    *index=newIndex;
+    index = newIndex;
 }
 
 /**
@@ -133,7 +132,7 @@ void Vertex::setIndex(int newIndex)
  */
 int Vertex::getIndex()
 {
-    return *(this->index);
+    return index;
 }
 
 /**

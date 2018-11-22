@@ -14,7 +14,7 @@ class Vertex
         /**
          * @brief index: Index asociated to the point
          */
-        int * index;
+        int index;
 
         /**
          * @brief coordinates: (X Y Z) coordinates
@@ -22,7 +22,7 @@ class Vertex
         double * coordinates;
 
         /**
-         * @brief facesContainingPoint: Faces that contains the point
+         * @brief facesContainingPoint: Pointer to vector of integers containing faces that contain the point
          */
         vector<int> * facesContainingPoint;
 
@@ -40,7 +40,7 @@ class Vertex
          * @param newIndex :  The index of the created Vertex
          * @param newCoordinates :  The 3D coordinates of the Vertex
          */
-        Vertex(int newIndex, double* newCoordinates , int numberOfFaces);
+        Vertex(int newIndex, double* newCoordinates);
 
         /**
          * @brief ~Vertex

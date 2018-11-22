@@ -6,10 +6,10 @@
  * @param vertexNumber :  number of vertex of the mesh
  * @param facesNumber  :  number of faces of the mesh
  */
-Mesh::Mesh(int vertexNumber, int facesNumber)
+Mesh::Mesh()
 {
-    vertexes = new vector<Vertex>(vertexNumber);
-    faces = new vector<Face>(facesNumber);
+    vertexes = new vector<Vertex *>();
+    faces = new vector<Face *>();
 }
 
 /**
@@ -26,22 +26,22 @@ Mesh::~Mesh()
  * @param newVertex: The value of the vertex
  * @param position:  Position to include the vertex
  */
-void Mesh::setVertex(Vertex newVertex , int position)
+void Mesh::setVertex(Vertex * newVertex , int position)
 {
     if( (unsigned int)position < vertexes->size())
     {
-        ( *vertexes).at(position)=newVertex;
+        vertexes->at(position) = newVertex;
     }
-
 }
 
 /**
  * @brief Mesh::addNewVertex: Add a new vertex in the mesh
  * @param newVertex: The new vertex to include in the mesh
  */
-void Mesh::addNewVertex(Vertex newVertex)
+void Mesh::addNewVertex(Vertex * newVertex)
 {
-    ( *vertexes).push_back(newVertex);
+
+    vertexes->push_back(newVertex);
 }
 
 /**
@@ -49,54 +49,39 @@ void Mesh::addNewVertex(Vertex newVertex)
  * @param newFace: The face to include
  * @param position:  Position to include the face
  */
-void Mesh::setFace(Face newFace, int position)
+void Mesh::setFace(Face * newFace, int position)
 {
     if( (unsigned int)position < faces->size())
     {
-        ( *faces).at(position)=newFace;
+        faces->at(position)=newFace;
     }
 }
-
 
 /**
  * @brief Mesh::addNewVertex: Add a new face at the end of the mesh
  * @param newVertex: The new face to include in the mesh
  */
-void Mesh::addNewFace(Face newFace)
+void Mesh::addNewFace(Face * newFace)
 {
-    ( *faces).push_back(newFace);
+    faces->push_back(newFace);
 }
-
 
 /**
  * @brief getAllFaces : Return a vector of all the Faces in the mesh
  * @return
  */
-vector<Face> Mesh::getAllFaces()
+vector<Face *> * Mesh::getAllFaces()
 {
-    return *faces;
+    return faces;
 }
-
-
 
 /**
  * @brief getAllVertexes: Return a vector of all the vertex in the mesh
  * @return
  */
-vector<Vertex>  Mesh::getAllVertexes()
+vector<Vertex * > *  Mesh::getAllVertexes()
 {
-    return *vertexes;
-}
-
-
-/**
- * @brief getFace:  Returns the face on a given position
- * @param position
- * @return
- */
-Face  Mesh::getFace(int position)
-{
-    return (*faces).at(position);
+    return vertexes;
 }
 
 /**
@@ -104,7 +89,17 @@ Face  Mesh::getFace(int position)
  * @param position
  * @return
  */
-Vertex Mesh::getVertex(int position)
+Face * Mesh::getFace(int position)
 {
-    return (*vertexes).at(position);
+    return faces->at(position);
+}
+
+/**
+ * @brief getFace:  Returns the face on a given position
+ * @param position
+ * @return
+ */
+Vertex * Mesh::getVertex(int position)
+{
+    return vertexes->at(position);
 }
