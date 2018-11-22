@@ -96,6 +96,10 @@ Mesh * FileManager::readOFF(QFile * offFile)
               f1 = atoi(line.substr(delimiterPos_2+1, delimiterPos_3 - (delimiterPos_2 + 1)).c_str());
               f2 = atoi(line.substr(delimiterPos_3+1).c_str());
 
+              surface->getVertex(f0)->addNewFace(iFace);
+              surface->getVertex(f1)->addNewFace(iFace);
+              surface->getVertex(f2)->addNewFace(iFace);
+
               Face  * faceVertex = new Face;
               faceVertex->setPointsInFace(f0, f1, f2);
               faceVertex->setFaceIndex(iFace);
@@ -223,10 +227,14 @@ Mesh * FileManager::readTriVert(QFile * triFile, QFile * vertFile)
         {
             getline(myTriFile, line);
             delimiterPos_1 = line.find(" ", 0);
-            f0 = atoi(line.substr(0,delimiterPos_1).c_str());
+            f0 = atoi(line.substr(0,delimiterPos_1).c_str()) -1;
             delimiterPos_2 = line.find(" ", delimiterPos_1+1);
-            f1 = atoi(line.substr(delimiterPos_1+1,delimiterPos_2 - (delimiterPos_1 + 1)).c_str());
-            f2 = atoi(line.substr(delimiterPos_2+1).c_str());
+            f1 = atoi(line.substr(delimiterPos_1+1,delimiterPos_2 - (delimiterPos_1 + 1)).c_str()) - 1;
+            f2 = atoi(line.substr(delimiterPos_2+1).c_str()) - 1;
+
+            surface->getVertex(f0)->addNewFace(iFace);
+            surface->getVertex(f1)->addNewFace(iFace);
+            surface->getVertex(f2)->addNewFace(iFace);
 
             Face  * faceVertex = new Face;
             faceVertex->setPointsInFace(f0, f1, f2);
