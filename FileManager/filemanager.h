@@ -6,9 +6,6 @@
 
 class FileManager
 {
-private:
-
-
 public:
     /**
      * @brief FileManager Constructor for FileManager
