@@ -4,10 +4,11 @@
  * @brief Face::Face
  *  This method construct a Face class without defining its private objects
  */
+ 
 Face::Face()
 {
     faceIndex = 0 ;
-    pointsInFace = new (nothrow) int[3] ;
+    pointsInFace = new (nothrow) int[3];
     if (pointsInFace == nullptr)
     {
         cout << "Error: memory could not be allocated";
@@ -20,16 +21,17 @@ Face::Face()
         }
     }
 }
+
 /**
  * @brief Face::Face
  * This method construct a Face class defining the following objects
  * @param newIndex :  The index of the created Face
  * @param newCoordinates :  The Face indexes coordinates of the Face
  */
-Face::Face(int newIndex, int* newPoints )
+Face::Face(int newIndex, int* newPoints)
 {
     faceIndex = newIndex ;
-    pointsInFace = new (nothrow) int[3] ;
+    pointsInFace = new (nothrow) int[3];
     if (pointsInFace == nullptr)
     {
         cout << "Error: memory could not be allocated";
@@ -42,6 +44,7 @@ Face::Face(int newIndex, int* newPoints )
         }
     }
 }
+
 /**
  * @brief Face::~Face
  * This method is the destructor of a Face Class
@@ -50,6 +53,7 @@ Face::~Face()
 {
     delete[] this->pointsInFace;
 }
+
 /**
  * @brief Face::setPointsInFace
  * This method writes the indexes of the points inlcuded in the face
@@ -62,6 +66,7 @@ void Face::setPointsInFace(int *newPoints)
         *( pointsInFace + i ) = *( newPoints + i );
     }
 }
+
 /**
  * @brief setPointsInFace
  * This method writes the indexes of the points inlcuded in the face
@@ -77,6 +82,7 @@ void Face::setPointsInFace( int point1, int point2, int point3)
         *( pointsInFace + i ) = *( newPoints + i );
     }
 }
+
 /**
  * @brief Face::setFaceIndex
  * This method allows to set the index of the Face by the parameter newIndex
@@ -86,6 +92,7 @@ void Face::setFaceIndex(int newIndex)
 {
     faceIndex = newIndex;
 }
+
 /**
  * @brief Face::getFaceIndex
  * @returns the index value of the Face
@@ -94,6 +101,7 @@ int Face::getFaceIndex()
 {
     return faceIndex;
 }
+
 /**
  * @brief Face::getPointsInFace
  * @return a pointer type int to the object pointsInFace
