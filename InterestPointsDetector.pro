@@ -17,9 +17,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
     UI/mainwindow.cpp \
-    Basic_Structures/face.cpp \
-    Basic_Structures/mesh.cpp \
-    Basic_Structures/vertex.cpp \
+    BasicStructures/face.cpp \
+    BasicStructures/mesh.cpp \
+    BasicStructures/vertex.cpp \
+    Communicator/communicator.cpp \
+    Communicator/exception.cpp \
+    FileManager/FileManager.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -28,8 +31,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     UI/mainwindow.h \
-    Basic_Structures/face.h \
-    Basic_Structures/mesh.h \
-    Basic_Structures/vertex.h
+    BasicStructures/face.h \
+    BasicStructures/mesh.h \
+    BasicStructures/vertex.h \
+    Communicator/communicator.h \
+    Communicator/exception.h \
+    FileManager/FileManager.h
 
 DISTFILES +=

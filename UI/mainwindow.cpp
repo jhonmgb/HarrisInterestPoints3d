@@ -1,7 +1,9 @@
 #include "UI/mainwindow.h"
+#include "Communicator/exception.h"
+#include <QDebug>
 
 // Constructor.
-MainWindow::MainWindow(QWidget * parent) : QMainWindow(parent)
+MainWindow::MainWindow(Communicator * communicator, QWidget * parent) : QMainWindow(parent)
 {
     QHBoxLayout * hboxLayout = new QHBoxLayout();
 
@@ -22,6 +24,11 @@ MainWindow::MainWindow(QWidget * parent) : QMainWindow(parent)
     mainWidget->setLayout(hboxLayout);
 
     setCentralWidget(mainWidget);
+
+    file1 = new QString();
+    file2 = new QString();
+
+    this->communicator = communicator;
 }
 
 /**
@@ -33,6 +40,9 @@ void MainWindow::initializeLoadFilesPanel()
     off = new QRadioButton(".off");
     triVert = new QRadioButton(".tri .vert");
     triVert->setChecked(true);
+
+    meshType = MeshType::TRIVERT;
+
     QButtonGroup * group = new QButtonGroup();
     group->addButton(off, 0);
     group->addButton(triVert, 1);
@@ -59,7 +69,9 @@ void MainWindow::initializeLoadFilesPanel()
     gridLayout->addWidget(openFile2, 2, 2);
 
     renderButton = new QPushButton(QString("Renderize"));
-    gridLayout->addWidget(renderButton, 3, 0, 1, 3);
+    loadMeshButton = new QPushButton(QString("Load Mesh"));
+    gridLayout->addWidget(loadMeshButton, 3, 0, 1, 2);
+    gridLayout->addWidget(renderButton, 3, 2);
 
     loadFilesPanel = new QGroupBox();
     loadFilesPanel->setLayout(gridLayout);
@@ -77,6 +89,8 @@ void MainWindow::initializeLoadFilesPanel()
     connect(
         openFile2, &QPushButton::clicked,
         this, [=](){ this->loadFile(openFile2); });
+
+    connect(loadMeshButton, &QPushButton::clicked,this, &MainWindow::loadMesh);
 }
 
 /**
@@ -118,6 +132,7 @@ void MainWindow::updateFilesPanel(QAbstractButton * button)
         labelFile2->hide();
         openFile2->hide();
         path2->hide();
+        meshType = MeshType::OFF;
     }
     else if (button == triVert)
     {
@@ -127,6 +142,7 @@ void MainWindow::updateFilesPanel(QAbstractButton * button)
         labelFile2->show();
         openFile2->show();
         path2->show();
+        meshType = MeshType::TRIVERT;
     }
 }
 
@@ -140,22 +156,31 @@ void MainWindow::loadFile(QAbstractButton * origin)
     QString title;
     QString filter;
     QLineEdit * lineEdit = 0;
+    QString ** filePath;
 
     if (origin == openFile1)
     {
         title = QString((isOff)? "Choose an OFF file" : "Choose a .tri file");
         filter = QString((isOff)? "OFF (*.off)" : "TRI (*.tri)");
         lineEdit = path1;
+        filePath = &file1;
+
     }
     else if (origin == openFile2)
     {
         title = QString("Choose a .vert file");
         filter = QString("VERT (*.vert)");
         lineEdit = path2;
+        filePath = &file2;
     }
 
     QString fileName = QFileDialog::getOpenFileName(this, title, ".", filter);
-    lineEdit->setText(fileName);
+
+    if (! fileName.isEmpty())
+    {
+        *filePath = new QString(fileName);
+        lineEdit->setText(fileName);
+    }
 }
 
 /**
@@ -166,4 +191,29 @@ void MainWindow::initializeOglPanel()
     oglContainer = new QGroupBox();
     oglContainer->setMinimumSize(QSize(500, 500));
     oglContainer->setTitle(QString("Render"));
+}
+
+void MainWindow::loadMesh()
+{
+    bool errorState = file1->isEmpty() || file1->isNull();
+
+    if (meshType == MeshType::TRIVERT)
+    {
+        errorState = errorState || file2->isEmpty() || file2->isNull();
+    }
+
+    if (errorState)
+    {
+        QString message = "Please choose the files to build the mesh";
+        QMessageBox::warning(this, QString("Warning"), message);
+        return;
+    }
+    try
+    {
+        communicator->loadMesh(meshType, *file1, *file2);
+    }
+    catch (Exception & e)
+    {
+        QMessageBox::critical(this, "Error", e.what());
+    }
 }

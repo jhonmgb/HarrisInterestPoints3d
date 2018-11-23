@@ -1,21 +1,15 @@
-#include "filemanager.h"
-#include "mesh.h"
+#include "FileManager/filemanager.h"
 #include <QFile>
 #include <QString>
 #include <fstream>
 #include <string>
-
-
 
 /**
  * @brief FileManager Constructor for FileManager
  */
 FileManager::FileManager()
 {
-
-
 }
-
 
 /**
  * @brief readOFF Read an OFF file
@@ -36,7 +30,6 @@ Mesh * FileManager::readOFF(QFile * offFile)
 
     if(fileFormat == "off")
     {
-
         //First, get number of vertexes and number of faces
         unsigned int delimiterPos_1(0), delimiterPos_2(0), delimiterPos_3(0);
         ifstream myfile (offFileNameString);
@@ -120,7 +113,6 @@ Mesh * FileManager::readOFF(QFile * offFile)
     }
     return 0;
 }
-
 
 /**
  * @brief readTriVert Read Tri and Vert files

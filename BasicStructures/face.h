@@ -2,11 +2,10 @@
 #define FACE_H
 
 #include <iostream>
-#include <vector>
-#include <algorithm>
 #include <new>
 
-using namespace std;
+using std::cout;
+using std::nothrow;
 
 class Face
 {

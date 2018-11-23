@@ -1,10 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include <iostream>
 #include <vector>
-#include <algorithm>
-#include <new>
 #include "face.h"
 #include "vertex.h"
 
