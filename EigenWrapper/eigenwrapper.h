@@ -55,7 +55,7 @@ public:
     /**
      * @brief EVectorXi Default constructor for wrapper class EVectorXi
      */
-    EVectorXi();
+    EVectorXi(); 
 
     /**
      * @brief EVectorXi Wrapped constructor for creation of vector of integers of size numElem
