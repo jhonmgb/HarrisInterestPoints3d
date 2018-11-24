@@ -1,5 +1,5 @@
-#include "engine.h"
-#include "Basic_Structures/mesh.h"
+#include "../Engine/engine.h"
+#include "../Basic_Structures/mesh.h"
 #include "eigenwrapper.h"
 #include <vector>
 #include <set>
@@ -37,11 +37,13 @@ vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k)
         //Get neighbourhood k
         EVectorXi facesForThisVertex = computations.getFacesForVertex(theMesh, iVertex);
         EVectorXi neighbours = computations.getDirectNeighbours(iVertex, faces, facesForThisVertex);
-        EVectorXi kRings = computations.getRings(iVertex, k, faces, neighbours, theMesh);
+        EVectorXi kRings = computations.getRings(iVertex, numRings, faces, neighbours, theMesh);
         EMatrixXd pointskRings = computations.getVertexesFromIndexes(kRings, theMesh);
-        EVector3d currentVertex = computations.getVertexFromMeshAsEVector3d(iVertex, theMesh);
+        int currentVertexIndexInkRings = computations.getVertexIndexInNeighbourhood(iVertex, kRings);
+
         //Here use pointskRings to compute PCA, fitting surface, etc
-        //Esteban = PCA(currentVertex, pointskRings)
+        //Esteban = PCA(currentVertexIndexInkRings, pointskRings)
+
 
         //Here compute harris operator using info from surface fitting
 
@@ -205,7 +207,6 @@ EMatrixXd Engine::getVertexesFromIndexes(EVectorXi indexes, Mesh * theMesh)
     EMatrixXd points(indexes.size(), 3);
     for(int iP=0; iP<indexes.size(); iP++)
     {
-        cout << "hi" << endl;
         double * xyz =  theMesh->getVertex(indexes(iP))->getCoordinates();
         points(iP, 0) = xyz[0];
         points(iP, 1) = xyz[1];
@@ -228,4 +229,24 @@ EVector3d Engine::getVertexFromMeshAsEVector3d(int position, Mesh * theMesh)
     vertexVector(1) = xyz[1];
     vertexVector(2) = xyz[2];
     return vertexVector;
+}
+
+/**
+ * @brief getVertexIndexInNeighbourhood Gets index of vertex in the neighbourhood vector
+ * @param vertexIndex is the index of vertex for which neighbourhood was computed
+ * @param indexesOfNeighbours is the vector with the indexes of the neighbours
+ * @return index of vertexIndex in indexOfNeighbours
+ */
+int Engine::getVertexIndexInNeighbourhood(int vertexIndex, EVectorXi indexesOfNeighbours)
+{
+    int indexOfVertex(0);
+    for(int i=0; i<indexesOfNeighbours.size(); i++)
+    {
+        if(indexesOfNeighbours(i)==vertexIndex)
+        {
+            indexOfVertex = i;
+            break;
+        }
+    }
+    return indexOfVertex;
 }

@@ -1,4 +1,4 @@
-#include "Basic_Structures/mesh.h"
+#include "../Basic_Structures/mesh.h"
 #include <vector>
 #include "eigenwrapper.h"
 #ifndef ENGINE_H
@@ -82,6 +82,13 @@ public:
      */
     EVector3d getVertexFromMeshAsEVector3d(int position, Mesh * theMesh);
 
+    /**
+     * @brief getVertexIndexInNeighbourhood Gets index of vertex in the neighbourhood vector
+     * @param vertexIndex is the index of vertex for which neighbourhood was computed
+     * @param indexesOfNeighbours is the vector with the indexes of the neighbours
+     * @return index of vertexIndex in indexOfNeighbours
+     */
+    int getVertexIndexInNeighbourhood(int vertexIndex, EVectorXi indexesOfNeighbours);
 
     //Here add functions for PCA and surface fitting
 
