@@ -1,8 +1,10 @@
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
-#include "BasicStructures/mesh.h"
-#include "mesh.h"
+#include "../BasicStructures/mesh.h"
 #include <QFile>
+#include <QString>
+#include <fstream>
+#include <string>
 
 class FileManager
 {

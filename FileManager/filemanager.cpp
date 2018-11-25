@@ -1,10 +1,4 @@
-#include "FileManager/filemanager.h"
 #include "filemanager.h"
-#include "mesh.h"
-#include <QFile>
-#include <QString>
-#include <fstream>
-#include <string>
 
 /**
  * @brief FileManager Constructor for FileManager

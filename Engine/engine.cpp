@@ -1,10 +1,4 @@
 #include "../Engine/engine.h"
-#include "../Basic_Structures/mesh.h"
-#include "eigenwrapper.h"
-#include <vector>
-#include <set>
-#include <algorithm>
-#include <iterator>
 
 using std::set_difference;
 using std::inserter;
@@ -27,18 +21,18 @@ Engine::Engine()
 vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k)
 {
     Engine computations = Engine();
-    EMatrixXd vertexes = computations.getVertexesFromMesh(theMesh);
-    EMatrixXi faces = computations.getFacesFromMesh(theMesh);
-    EVectorXd harrisValues(vertexes.rows()); //Vector for storing values of harris operator for each vertex
+    MatrixXd vertexes = computations.getVertexesFromMesh(theMesh);
+    MatrixXi faces = computations.getFacesFromMesh(theMesh);
+    VectorXd harrisValues(vertexes.rows()); //Vector for storing values of harris operator for each vertex
 
     //For each vertex, compute harris operator
     for(int iVertex=0; iVertex< vertexes.rows(); iVertex++)
     {
         //Get neighbourhood k
-        EVectorXi facesForThisVertex = computations.getFacesForVertex(theMesh, iVertex);
-        EVectorXi neighbours = computations.getDirectNeighbours(iVertex, faces, facesForThisVertex);
-        EVectorXi kRings = computations.getRings(iVertex, numRings, faces, neighbours, theMesh);
-        EMatrixXd pointskRings = computations.getVertexesFromIndexes(kRings, theMesh);
+        VectorXi facesForThisVertex = computations.getFacesForVertex(theMesh, iVertex);
+        VectorXi neighbours = computations.getDirectNeighbours(iVertex, faces, facesForThisVertex);
+        VectorXi kRings = computations.getRings(iVertex, numRings, faces, neighbours, theMesh);
+        MatrixXd pointskRings = computations.getVertexesFromIndexes(kRings, theMesh);
         int currentVertexIndexInkRings = computations.getVertexIndexInNeighbourhood(iVertex, kRings);
 
         //Here use pointskRings to compute PCA, fitting surface, etc
@@ -53,15 +47,15 @@ vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k)
 }
 
 /**
- * @brief getVertexesFromMesh converts vector of vertexes of theMesh into an EMatrixXd
+ * @brief getVertexesFromMesh converts vector of vertexes of theMesh into an MatrixXd
  * @param theMesh is the mesh or surface being analyzed (read and sent from middleware)
  * @return Matrix with vertexes
  */
-EMatrixXd Engine::getVertexesFromMesh(Mesh * theMesh)
+MatrixXd Engine::getVertexesFromMesh(Mesh * theMesh)
 {
     int numPoints = theMesh->getAllVertexes()->size();
     double * currVertex = NULL;
-    EMatrixXd points(numPoints,3);
+    MatrixXd points(numPoints,3);
     for(int iVertex=0; iVertex<numPoints; iVertex++)
     {
         currVertex = theMesh->getVertex(iVertex)->getCoordinates();
@@ -74,15 +68,15 @@ EMatrixXd Engine::getVertexesFromMesh(Mesh * theMesh)
 }
 
 /**
- * @brief getFacesFromMesh converts vector of faces of theMesh into an EMatrixXi
+ * @brief getFacesFromMesh converts vector of faces of theMesh into an MatrixXi
  * @param theMesh is the mesh or surface being analyzed (read and sent from middleware)
  * @return Matrix with faces
  */
-EMatrixXi Engine::getFacesFromMesh(Mesh * theMesh)
+MatrixXi Engine::getFacesFromMesh(Mesh * theMesh)
 {
     int numFaces = theMesh->getAllFaces()->size();
     int * currFace = NULL;
-    EMatrixXi faces(numFaces, 3);
+    MatrixXi faces(numFaces, 3);
     for(int iFace=0; iFace<numFaces; iFace++)
     {
         currFace = theMesh->getFace(iFace)->getPointsInFace();
@@ -100,10 +94,10 @@ EMatrixXi Engine::getFacesFromMesh(Mesh * theMesh)
  * @param pointIndex Index of the point for which faces have to be found
  * @return Vector with indexes of faces in which vertex is involved
  */
-EVectorXi Engine::getFacesForVertex(Mesh * theMesh, int pointIndex)
+VectorXi Engine::getFacesForVertex(Mesh * theMesh, int pointIndex)
 {
     vector<int> facesForVertex = theMesh->getVertex(pointIndex)->getFaces();
-    EVectorXi facesForThisVertex(facesForVertex.size());
+    VectorXi facesForThisVertex(facesForVertex.size());
     for(int iF=0; iF<facesForVertex.size(); iF++)
     {
         facesForThisVertex(iF) = facesForVertex.at(iF);
@@ -118,7 +112,7 @@ EVectorXi Engine::getFacesForVertex(Mesh * theMesh, int pointIndex)
  * @param facesThatContainPoint is the vector that contains indexes of faces that contain vertex
  * @return Indexes of direct neighbours as a vector
  */
-EVectorXi Engine::getDirectNeighbours(int iVertex, EMatrixXi faces, EVectorXi facesThatContainPoint)
+VectorXi Engine::getDirectNeighbours(int iVertex, MatrixXi faces, VectorXi facesThatContainPoint)
 {
     int numFacesWithVertex = facesThatContainPoint.size();
     set<int> directNeighbours;
@@ -133,7 +127,7 @@ EVectorXi Engine::getDirectNeighbours(int iVertex, EMatrixXi faces, EVectorXi fa
         }
     }
     int numDirectNeighbours = directNeighbours.size();
-    EVectorXi vertexesFirstNeighbourhood(numDirectNeighbours);
+    VectorXi vertexesFirstNeighbourhood(numDirectNeighbours);
     int ctrlVar1(0);
     for (set<int>::iterator it=directNeighbours.begin(); it!=directNeighbours.end(); ++it)
     {
@@ -152,7 +146,7 @@ EVectorXi Engine::getDirectNeighbours(int iVertex, EMatrixXi faces, EVectorXi fa
  * @param theMesh is the mesh or surface being analyzed (read and sent from middleware)
  * @return a vector with indexes of neighbours until depth k (includes all points within ring k and also ring k)
  */
-EVectorXi Engine::getRings(int vertex, int k, EMatrixXi faces, EVectorXi firstNeighbours, Mesh * theMesh)
+VectorXi Engine::getRings(int vertex, int k, MatrixXi faces, VectorXi firstNeighbours, Mesh * theMesh)
 {
     set <int> s0;
     s0.insert(vertex);
@@ -170,8 +164,8 @@ EVectorXi Engine::getRings(int vertex, int k, EMatrixXi faces, EVectorXi firstNe
     {
         for (set<int>::iterator it=s1.begin(); it!=s1.end(); ++it)
         {
-            EVectorXi facesThatContainPoint = this->getFacesForVertex(theMesh, *it);
-            EVectorXi someNeighbours = this->getDirectNeighbours(*it, faces, facesThatContainPoint);
+            VectorXi facesThatContainPoint = this->getFacesForVertex(theMesh, *it);
+            VectorXi someNeighbours = this->getDirectNeighbours(*it, faces, facesThatContainPoint);
             for(int i=0; i<someNeighbours.size(); i++)
             {
                 sAccum.insert(someNeighbours(i));
@@ -186,7 +180,7 @@ EVectorXi Engine::getRings(int vertex, int k, EMatrixXi faces, EVectorXi firstNe
         tempSet2.clear();
     }
     int kNeighboursSize = result.size();
-    EVectorXi kNeighbours(kNeighboursSize);
+    VectorXi kNeighbours(kNeighboursSize);
     int ctrlVar1(0);
     for (set<int>::iterator it=result.begin(); it!=result.end(); ++it)
     {
@@ -202,9 +196,9 @@ EVectorXi Engine::getRings(int vertex, int k, EMatrixXi faces, EVectorXi firstNe
  * @param theMesh is the mesh or surface being analyzed (read and sent from middleware)
  * @return Matrix with points corresponding to given indexes
  */
-EMatrixXd Engine::getVertexesFromIndexes(EVectorXi indexes, Mesh * theMesh)
+MatrixXd Engine::getVertexesFromIndexes(VectorXi indexes, Mesh * theMesh)
 {
-    EMatrixXd points(indexes.size(), 3);
+    MatrixXd points(indexes.size(), 3);
     for(int iP=0; iP<indexes.size(); iP++)
     {
         double * xyz =  theMesh->getVertex(indexes(iP))->getCoordinates();
@@ -216,15 +210,15 @@ EMatrixXd Engine::getVertexesFromIndexes(EVectorXi indexes, Mesh * theMesh)
 }
 
 /**
- * @brief getVertexFromMeshAsEVector3d Gets a vertex as a vector from its position or index
+ * @brief getVertexFromMeshAsVector3d Gets a vertex as a vector from its position or index
  * @param position is the index of the vertex that is required
  * @param theMesh is the mesh or surface being analyzed (read and sent from middleware)
  * @return
  */
-EVector3d Engine::getVertexFromMeshAsEVector3d(int position, Mesh * theMesh)
+Vector3d Engine::getVertexFromMeshAsVector3d(int position, Mesh * theMesh)
 {
     double * xyz = theMesh->getVertex(position)->getCoordinates();
-    EVector3d vertexVector;
+    Vector3d vertexVector;
     vertexVector(0) = xyz[0];
     vertexVector(1) = xyz[1];
     vertexVector(2) = xyz[2];
@@ -237,7 +231,7 @@ EVector3d Engine::getVertexFromMeshAsEVector3d(int position, Mesh * theMesh)
  * @param indexesOfNeighbours is the vector with the indexes of the neighbours
  * @return index of vertexIndex in indexOfNeighbours
  */
-int Engine::getVertexIndexInNeighbourhood(int vertexIndex, EVectorXi indexesOfNeighbours)
+int Engine::getVertexIndexInNeighbourhood(int vertexIndex, VectorXi indexesOfNeighbours)
 {
     int indexOfVertex(0);
     for(int i=0; i<indexesOfNeighbours.size(); i++)
