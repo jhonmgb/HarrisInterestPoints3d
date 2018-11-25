@@ -136,6 +136,16 @@ public:
      */
     MatrixXd findderivativeEmatrix(MatrixXd X);
 
+    /**
+     * @brief computeHarris computes the Harris operator for the current point
+     * @param E Matrix with parameters A,B,C obtained from surface fitting
+     * @param k Paramter for Harris operator calculation according to formula (3)
+     * @return Value of Harris operator according to equation (3)
+     */
+    double computeHarris(MatrixXd E, double k);
+
+    //Here pre-select points according to local maxima of Harris operator
+
     //Here select interest points according to highest Harris operator or clustering
 
 };
