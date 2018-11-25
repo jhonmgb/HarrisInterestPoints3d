@@ -1,8 +1,7 @@
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
-#include "mesh.h"
+#include "BasicStructures/mesh.h"
 #include <QFile>
-
 
 class FileManager
 {

@@ -10,9 +10,12 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QMainWindow>
 #include <QPushButton>
 #include <QRadioButton>
+
+#include "Communicator/communicator.h"
 
 /**
  * @brief The MainWindow class
@@ -20,6 +23,8 @@
 class MainWindow : public QMainWindow
 {
 private:
+    QString * file1;
+    QString * file2;
     QGroupBox * loadFilesPanel;
     QGroupBox * propertiesPanel;
     QGroupBox * oglContainer;
@@ -38,8 +43,12 @@ private:
     QComboBox * selectionMode;
     QLineEdit * parameterSelection;
 
+    QPushButton * loadMeshButton;
     QPushButton * renderButton;
     QPushButton * calculateInterestPoints;
+
+    Communicator * communicator;
+    MeshType meshType;
 
     /**
      * @brief initializeLoadFilesPanel Initialize the panel with the UI
@@ -73,10 +82,14 @@ private slots:
      */
     void loadFile(QAbstractButton * origin);
 
+    /**
+     * @brief loadMesh loads the mesh into the Communicator.
+     */
+    void loadMesh();
 public:
 
     // Constructor.
-    explicit MainWindow(QWidget * parent = 0);
+    explicit MainWindow(Communicator * communicator, QWidget * parent = 0);
 };
 
 #endif // MAINWINDOW_H

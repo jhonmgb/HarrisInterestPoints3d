@@ -1,12 +1,14 @@
 #ifndef VERTEX_H
 #define VERTEX_H
 
-#include <iostream>
-#include <vector>
 #include <algorithm>
+#include <iostream>
 #include <new>
+#include <vector>
 
-using namespace std;
+using std::cout;
+using std::nothrow;
+using std::vector;
 
 class Vertex
 {
