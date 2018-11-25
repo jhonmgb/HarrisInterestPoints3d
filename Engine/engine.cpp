@@ -28,18 +28,33 @@ vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k)
     //For each vertex, compute harris operator
     for(int iVertex=0; iVertex< vertexes.rows(); iVertex++)
     {
-        //Get neighbourhood k
+        //Get indexes of faces that contain current vertex
         VectorXi facesForThisVertex = computations.getFacesForVertex(theMesh, iVertex);
+        //Get indexes of direct neighbours:
         VectorXi neighbours = computations.getDirectNeighbours(iVertex, faces, facesForThisVertex);
+        //Get indexes of vertexes in neighbourhood k
         VectorXi kRings = computations.getRings(iVertex, numRings, faces, neighbours, theMesh);
+        //Get matrix with points in neighbourhood k (convert indexes to points)
         MatrixXd pointskRings = computations.getVertexesFromIndexes(kRings, theMesh);
+        //Find location of current point in vector of indexes of neighbourhood k
         int currentVertexIndexInkRings = computations.getVertexIndexInNeighbourhood(iVertex, kRings);
 		MatrixXd Centroid;
+        //Center points
 		MatrixXd centeredPoints = computations.centerNeighbourhood(pointskRings, Centroid);
+        //Rotate
 		MatrixXd rotatedPoints  = computations.rotateToFitPlane(centeredPoints,currentVertexIndexInkRings);
-		MatrixXd fittedPlane = computations.fitQuadraticSurface(rotatedPoints,currentVertexIndexInkRings);
-		MatrixXd matrixE = computations.findderivativeEmatrix(fittedPlane);
+        //Fit surface to points
+        MatrixXd fittedSurface = computations.fitQuadraticSurface(rotatedPoints,currentVertexIndexInkRings);
+        //Find derivative of surface
+        MatrixXd matrixE = computations.findderivativeEmatrix(fittedSurface);
+        //Compute Harris operator
+        double harrisOperator = computations.computeHarris(matrixE, k);
+        //Store value of Harris operator for current point
+        harrisValues(iVertex) = harrisOperator;
 
+        //Here pre-select points according to local maxima
+
+        //Here select interest point according to fraction or clustering
     }
 
     return NULL;
@@ -303,8 +318,6 @@ MatrixXd Engine::rotateToFitPlane(MatrixXd centeredPoints, int analizedPointInde
         rotationMatrix.col(0) = eigenVectors.col(1);
         rotationMatrix.col(1) = eigenVectors.col(0);
     }
-    cout << "Original eigenvectors: " << endl << eigenVectors << endl;
-    cout << "Rotation matrix : " << endl << rotationMatrix << endl;
 
     // Rotate the centered points with te resulting rotationMatrix
     MatrixXd rotatedPoints = centeredPoints * rotationMatrix;
@@ -345,6 +358,12 @@ MatrixXd Engine::fitQuadraticSurface(MatrixXd rotatedPoints, int analizedPointIn
     return X;
 }
 
+/**
+ * @brief findderivativeEmatrix formulates the derivative matrix for
+ *        the harris operator
+ * @param X : the parameters of the Quadratic Surface.
+ * @return
+ */
 MatrixXd Engine::findderivativeEmatrix(MatrixXd X)
 {
     // Recover the parameter to perfor equation 10-12 of the paper
@@ -366,7 +385,20 @@ MatrixXd Engine::findderivativeEmatrix(MatrixXd X)
     E(1,0) = C;
     E(1,1) = B;
 
-    cout << "Harris matrix" << E << endl;
-
     return E;
+}
+
+/**
+ * @brief computeHarris computes the Harris operator for the current point
+ * @param E Matrix with parameters A,B,C obtained from surface fitting
+ * @param k Paramter for Harris operator calculation according to formula (3)
+ * @return Value of Harris operator according to equation (3)
+ */
+double Engine::computeHarris(MatrixXd E, double k)
+{
+    double A = E(0,0);
+    double C = E(0,1);
+    double B = E(1,1);
+    double harrisOperator = (A*B - C*C) - k*(A+B)*(A+B); //det(E) - k*(tr(E))^2
+    return harrisOperator;
 }
