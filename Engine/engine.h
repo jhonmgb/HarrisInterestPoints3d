@@ -97,9 +97,44 @@ public:
      */
     int getVertexIndexInNeighbourhood(int vertexIndex, VectorXi indexesOfNeighbours);
 
-    //Here add functions for PCA and surface fitting
+    /**
+     * @brief centerNeighbourhood :
+     *        Centrates a Neighbourhood arround its centroid and translate
+     *        the set of points to the origin
+     * @param Neighbourhood
+     * @return
+     */
+    MatrixXd centerNeighbourhood(MatrixXd Neighbourhood , MatrixXd& Centroid );
 
-    //Here function for computing Harris operator from surface fitting coefficients
+    /**
+     * @brief rotationToFitPlane:
+     *        Apply Principal Component Analysis to the set of points and
+     *        choose the eigenvector with the lowest associated eigenvalue
+     *        as the normal of the fitting plane.
+     * @param centeredPoints : the centrated points of the Neibourhood
+     * @param analizedPointIndex  : the vertex of analisys
+     * @return
+     */
+    MatrixXd rotateToFitPlane(MatrixXd centeredPoints, int analizedPointIndex);
+
+    /**
+     * @brief fitQuadraticSurface
+     *        Apply Least Squares to fit a quadratic surface to the rotated
+     *        points of the NEibourhood.
+     * @param rotatedPoints     : the rotated points of the Neibourhood
+     * @param analizedPointIndex  : the vertex of analisys
+     * @return
+     */
+    MatrixXd fitQuadraticSurface(MatrixXd rotatedPoints, int analizedPointIndex);
+
+
+    /**
+     * @brief findderivativeEmatrix formulates the derivative matrix for
+     *        the harris operator
+     * @param X : the parameters of the Quadratic Surface.
+     * @return
+     */
+    MatrixXd findderivativeEmatrix(MatrixXd X);
 
     //Here select interest points according to highest Harris operator or clustering
 
