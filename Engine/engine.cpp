@@ -34,12 +34,11 @@ vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k)
         VectorXi kRings = computations.getRings(iVertex, numRings, faces, neighbours, theMesh);
         MatrixXd pointskRings = computations.getVertexesFromIndexes(kRings, theMesh);
         int currentVertexIndexInkRings = computations.getVertexIndexInNeighbourhood(iVertex, kRings);
-
-        //Here use pointskRings to compute PCA, fitting surface, etc
-        //Esteban = PCA(currentVertexIndexInkRings, pointskRings)
-
-
-        //Here compute harris operator using info from surface fitting
+		MatrixXd Centroid;
+		MatrixXd centeredPoints = computations.centerNeighbourhood(pointskRings, Centroid);
+		MatrixXd rotatedPoints  = computations.rotateToFitPlane(centeredPoints,currentVertexIndexInkRings);
+		MatrixXd fittedPlane = computations.fitQuadraticSurface(rotatedPoints,currentVertexIndexInkRings);
+		MatrixXd matrixE = computations.findderivativeEmatrix(fittedPlane);
 
     }
 
@@ -243,4 +242,131 @@ int Engine::getVertexIndexInNeighbourhood(int vertexIndex, VectorXi indexesOfNei
         }
     }
     return indexOfVertex;
+}
+
+
+/**
+ * @brief centerNeighbourhood :
+ *        Centers a Neighborhood around its centroid and translate
+ *        the set of points to the origin
+ * @param Neighbourhood
+ * @return
+ */
+MatrixXd Engine::centerNeighbourhood(MatrixXd Neighbourhood , MatrixXd& Centroid )
+{
+    // Calculate the mean of all the values in the colums of the neibourghood
+    Centroid = Neighbourhood.colwise().sum() / Neighbourhood.rows();
+
+    // Center the Neighbour values with the calculated mean
+    MatrixXd centeredPoints = MatrixXd::Ones(Neighbourhood.rows(),1)
+                                                        * Centroid ;
+    centeredPoints = Neighbourhood - centeredPoints;
+    return centeredPoints;
+}
+
+
+/**
+ * @brief findBestFittingPlane:
+ *        Apply Principal Component Analysis to the set of points and
+ *        choose the eigenvector with the lowest associated eigenvalue
+ *        as the normal of the fitting plane.
+ * @param CenteredNeighbourhood
+ * @return
+ */
+MatrixXd Engine::rotateToFitPlane(MatrixXd centeredPoints, int analizedPointIndex)
+{
+    // As we centered the data before applying the PCA algorithm the covariance
+    // matrix can be calculated applying Cxy=P.t()*P;
+    MatrixXd covarianceMatrix = centeredPoints.transpose()*centeredPoints;
+    SelfAdjointEigenSolver<MatrixXd> covarianceDescomposition(covarianceMatrix);
+
+    // The function SelfAdjointEigenSolver returns the eigenvalues and eigenvectors
+    // sorted in increasing order, so we can take the first eigenvector as the normal
+    // of the fitting plane.
+    MatrixXd normalPlane = covarianceDescomposition.eigenvectors().col(0).matrix();
+
+    // To perform the rotation we take the eigenvectors in decreasing order
+    MatrixXd eigenVectors = covarianceDescomposition.eigenvectors().rowwise().reverse();
+
+    // Check if the rotation matrix fulfil the right hand law
+    // We take the analysis point and we check if the normal plane points upwards.
+    MatrixXd analizedPoint = centeredPoints.row(analizedPointIndex); // - Centroid;
+    MatrixXd zEigenVector  = covarianceDescomposition.eigenvectors().row(2).matrix();
+    double normalDirection = (analizedPoint * zEigenVector.transpose() )(0,0);
+
+    // If the direction of the normal plane is contrary to the analized point
+    // We must invert z direction and exchange the x and y columns
+    MatrixXd rotationMatrix = eigenVectors;
+    if( normalDirection < 0 )
+    {
+        rotationMatrix = -eigenVectors;
+        rotationMatrix.col(0) = eigenVectors.col(1);
+        rotationMatrix.col(1) = eigenVectors.col(0);
+    }
+    cout << "Original eigenvectors: " << endl << eigenVectors << endl;
+    cout << "Rotation matrix : " << endl << rotationMatrix << endl;
+
+    // Rotate the centered points with te resulting rotationMatrix
+    MatrixXd rotatedPoints = centeredPoints * rotationMatrix;
+    return rotatedPoints;
+}
+
+
+/**
+ * @brief fitQuadraticSurface
+ *        Apply Least Squares to fit a quadratic surface to the rotated
+ *        points of the NEibourhood.
+ * @param rotatedPoints     : the rotated points of the Neibourhood
+ * @param analizedPointIndex  : the vertex of analisys
+ * @return
+ */
+MatrixXd Engine::fitQuadraticSurface(MatrixXd rotatedPoints, int analizedPointIndex)
+{
+    MatrixXd analizedPoint = rotatedPoints.row(analizedPointIndex);
+    analizedPoint(0,2) = 0;
+    // Center the points in the XY plane
+    MatrixXd centeredXY = MatrixXd::Ones(rotatedPoints.rows(),1) * analizedPoint;
+    centeredXY = rotatedPoints - centeredXY;
+
+    // Solve the equation AX = b knowing that A are the coeffitiens of:
+    // [x*x x*y y*y x y 1] X = z
+    MatrixXd A = MatrixXd::Ones(rotatedPoints.rows(),6);
+    A.col(0) = rotatedPoints.col(0).cwiseProduct(rotatedPoints.col(0));
+    A.col(1) = rotatedPoints.col(0).cwiseProduct(rotatedPoints.col(1));
+    A.col(2) = rotatedPoints.col(1).cwiseProduct(rotatedPoints.col(1));
+    A.col(3) = rotatedPoints.col(0);
+    A.col(4) = rotatedPoints.col(1);
+    MatrixXd b = rotatedPoints.col(2);
+    MatrixXd X = A.fullPivLu().solve(b);
+
+    // X = [p1/2 p2 p3/2 p4 p5 p6] , so  we multiply X(0) and X(2) by 2
+    X(0) = X(0) * 2;
+    X(2) = X(2) * 2;
+    return X;
+}
+
+MatrixXd Engine::findderivativeEmatrix(MatrixXd X)
+{
+    // Recover the parameter to perfor equation 10-12 of the paper
+    double p1, p2, p3, p4, p5;
+    p1 = X(0,0);
+    p2 = X(1,0);
+    p3 = X(2,0);
+    p4 = X(3,0);
+    p5 = X(4,0);
+
+    double A = p4*p4 + 2*p1*p1 + 2*p2*p2;
+    double B = p5*p5 + 2*p2*p2 + 2*p3*p3;
+    double C = p4*p5 + 2*p1*p2 + 2*p2*p3;
+
+    // Creating matrix for the harris operator
+    MatrixXd E(2,2);
+    E(0,0) = A;
+    E(0,1) = C;
+    E(1,0) = C;
+    E(1,1) = B;
+
+    cout << "Harris matrix" << E << endl;
+
+    return E;
 }
