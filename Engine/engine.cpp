@@ -23,7 +23,8 @@ vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k)
     Engine computations = Engine();
     MatrixXd vertexes = computations.getVertexesFromMesh(theMesh);
     MatrixXi faces = computations.getFacesFromMesh(theMesh);
-    VectorXd harrisValues(vertexes.rows()); //Vector for storing values of harris operator for each vertex
+    int numVertexes = vertexes.rows();
+    VectorXd harrisValues(numVertexes); //Vector for storing values of harris operator for each vertex
 
     //For each vertex, compute harris operator
     for(int iVertex=0; iVertex< vertexes.rows(); iVertex++)
@@ -51,11 +52,44 @@ vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k)
         double harrisOperator = computations.computeHarris(matrixE, k);
         //Store value of Harris operator for current point
         harrisValues(iVertex) = harrisOperator;
-
-        //Here pre-select points according to local maxima
-
-        //Here select interest point according to fraction or clustering
     }
+
+    //Make pre - selection of interest points
+    set <int> preSelected;
+    bool discard(false);
+    //Pre-selection of points
+    for(int iVertex=0; iVertex< numVertexes; iVertex++)
+    {
+        discard = false;
+        //Get indexes of faces that contain current vertex
+        VectorXi facesForThisVertex = this->getFacesForVertex(theMesh, iVertex);
+        //Get indexes of direct neighbours:
+        VectorXi neighbours = this->getDirectNeighbours(iVertex, faces, facesForThisVertex);
+        //For each point, evaluate if its Harris response is greater than the one of its direct neighbours
+        for(int iNeighbour=0; iNeighbour < neighbours.size(); iNeighbour++)
+        {
+            if(harrisValues(iVertex) < harrisValues(neighbours(iNeighbour)))
+            {
+                discard = true;
+                break;
+            }
+        }
+        if(!discard)
+        {
+            preSelected.insert(iVertex);
+        }
+    }
+    //Convert set to VectorXi
+    int numPreselected = preSelected.size();
+    VectorXi preSelectedVertexes(numPreselected);
+    int ctrlVar1(0);
+    for (set<int>::iterator it=preSelected.begin(); it!=preSelected.end(); ++it)
+    {
+        preSelectedVertexes(ctrlVar1) = *it;
+        ctrlVar1++;
+    }
+
+    //Here, select interest points according to highest harris value and clustering (we have to receive another variable in this function)
 
     return NULL;
 }
@@ -402,3 +436,5 @@ double Engine::computeHarris(MatrixXd E, double k)
     double harrisOperator = (A*B - C*C) - k*(A+B)*(A+B); //det(E) - k*(tr(E))^2
     return harrisOperator;
 }
+
+

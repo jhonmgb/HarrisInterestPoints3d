@@ -144,8 +144,6 @@ public:
      */
     double computeHarris(MatrixXd E, double k);
 
-    //Here pre-select points according to local maxima of Harris operator
-
     //Here select interest points according to highest Harris operator or clustering
 
 };
