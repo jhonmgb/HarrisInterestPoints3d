@@ -5,6 +5,12 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    QSurfaceFormat format;
+    format.setDepthBufferSize(24);
+
+    QSurfaceFormat::setDefaultFormat(format);
+
     Communicator * communicator = new Communicator();
     MainWindow * window = new MainWindow(communicator, 0);
     window->resize(800, 600);

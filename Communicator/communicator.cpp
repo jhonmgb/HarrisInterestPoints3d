@@ -40,3 +40,8 @@ void Communicator::loadMesh(MeshType type, QString file1, QString file2)
         throw Exception(ExceptionType::ERROR_WHILE_READING, messge);
     }
 }
+
+Mesh * Communicator::getMesh()
+{
+    return mesh;
+}
