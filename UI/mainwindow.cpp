@@ -1,6 +1,6 @@
 #include "UI/mainwindow.h"
 #include "Communicator/exception.h"
-#include <QDebug>
+#include "Render/openglwidget.h"
 
 // Constructor.
 MainWindow::MainWindow(Communicator * communicator, QWidget * parent) : QMainWindow(parent)
@@ -17,6 +17,7 @@ MainWindow::MainWindow(Communicator * communicator, QWidget * parent) : QMainWin
 
     QWidget* widget = new QWidget(this);
     widget->setLayout(buttonsPanel);
+    widget->setMaximumWidth(300);
 
     QWidget * mainWidget = new QWidget(this);
     hboxLayout->addWidget(widget);
@@ -112,6 +113,9 @@ void MainWindow::initializePropertiesPanel()
     layout->addRow(new QLabel("Selection mode"), selectionMode);
     layout->addRow(new QLabel("Parameter selection"), parameterSelection);
 
+    harrisParam->setValidator( new QDoubleValidator(0, 100, 2, this) );
+    rings->setValidator( new QIntValidator(0, 200, this) );
+
     calculateInterestPoints = new QPushButton(QString("Calculate interest points"));
     layout->addRow(calculateInterestPoints);
 
@@ -188,9 +192,13 @@ void MainWindow::loadFile(QAbstractButton * origin)
  */
 void MainWindow::initializeOglPanel()
 {
+    render = new OpenGLWidget;
     oglContainer = new QGroupBox();
     oglContainer->setMinimumSize(QSize(500, 500));
     oglContainer->setTitle(QString("Render"));
+    QGridLayout * gridLayout = new QGridLayout(oglContainer);
+    gridLayout->addWidget(render);
+    oglContainer->setLayout(gridLayout);
 }
 
 void MainWindow::loadMesh()
@@ -216,4 +224,6 @@ void MainWindow::loadMesh()
     {
         QMessageBox::critical(this, "Error", e.what());
     }
+    render->drawMesh(communicator->getMesh());
+
 }

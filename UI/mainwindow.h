@@ -16,6 +16,7 @@
 #include <QRadioButton>
 
 #include "Communicator/communicator.h"
+#include "Render/openglwidget.h"
 
 /**
  * @brief The MainWindow class
@@ -48,6 +49,7 @@ private:
     QPushButton * calculateInterestPoints;
 
     Communicator * communicator;
+    OpenGLWidget * render;
     MeshType meshType;
 
     /**

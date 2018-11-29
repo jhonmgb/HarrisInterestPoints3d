@@ -1,4 +1,4 @@
-QT += core gui widgets
+QT += core gui widgets opengl
 
 CONFIG += c++11
 CONFIG -= app_bundle
@@ -22,7 +22,8 @@ SOURCES += \
     BasicStructures/vertex.cpp \
     Communicator/communicator.cpp \
     Communicator/exception.cpp \
-    FileManager/FileManager.cpp
+    FileManager/FileManager.cpp \
+    Render/openglwidget.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -36,6 +37,10 @@ HEADERS += \
     BasicStructures/vertex.h \
     Communicator/communicator.h \
     Communicator/exception.h \
-    FileManager/FileManager.h
+    FileManager/FileManager.h \
+    Render/openglwidget.h
 
 DISTFILES +=
+
+RESOURCES += \
+    shaders.qrc \
