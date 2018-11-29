@@ -22,8 +22,9 @@ SOURCES += \
     BasicStructures/vertex.cpp \
     Communicator/communicator.cpp \
     Communicator/exception.cpp \
-    FileManager/FileManager.cpp \
-    Render/openglwidget.cpp
+    FileManager/filemanager.cpp \
+    Render/openglwidget.cpp \
+    Engine/engine.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -37,8 +38,9 @@ HEADERS += \
     BasicStructures/vertex.h \
     Communicator/communicator.h \
     Communicator/exception.h \
-    FileManager/FileManager.h \
-    Render/openglwidget.h
+    FileManager/filemanager.h \
+    Render/openglwidget.h \
+    Engine/engine.h
 
 DISTFILES +=
 
