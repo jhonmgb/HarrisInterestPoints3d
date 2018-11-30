@@ -2,6 +2,7 @@
 
 using std::set_difference;
 using std::inserter;
+using std::sort;
 
 /**
  * @brief Engine Default constructor for class Engine
@@ -92,7 +93,30 @@ vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k,
         ctrlVar1++;
     }
 
+    //Get vector with harris values
+    VectorXd preSelectedHarrisValues(numPreselected);
+    for(int iPre = 0; iPre < numPreselected; iPre++ )
+    {
+        preSelectedHarrisValues(iPre) = harrisValues(preSelectedVertexes(iPre));
+    }
 
+    vector <int> preSelectedSorted;
+
+    double maxi(0);
+    for(int iIP = 0; iIP < preSelectedVertexes.size(); iIP++)
+    {
+        maxi = preSelectedHarrisValues.maxCoeff();
+        for(int i=0; i<preSelectedVertexes.size(); i++)
+        {
+            if(abs(maxi-preSelectedHarrisValues(i))<0.00001)
+            {
+                preSelectedSorted.push_back(preSelectedVertexes(i));
+                preSelectedHarrisValues(i) = 0;
+                break;
+            }
+        }
+
+    }
 
     if(selectionMode == "FRACTION")
     {
@@ -103,9 +127,10 @@ vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k,
             numPointsToChoose = preSelectedVertexes.size();
         }
         vector<int> * interestPoints = new vector<int>;
-        for(int iIP = preSelectedVertexes.size()-1; iIP > preSelectedVertexes.size() - 1 - numPointsToChoose; iIP--)
+
+        for(int i=0; i<numPointsToChoose; i++)
         {
-            interestPoints->push_back(preSelectedVertexes(iIP));
+            interestPoints->push_back(preSelectedSorted.at(i));
         }
         return interestPoints;
     }

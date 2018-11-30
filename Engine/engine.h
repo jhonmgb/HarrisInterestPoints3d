@@ -5,6 +5,7 @@
 #include <set>
 #include <algorithm>
 #include <iterator>
+#include <cmath>
 
 using namespace Eigen;
 
