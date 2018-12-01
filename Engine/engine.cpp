@@ -2,6 +2,7 @@
 
 using std::set_difference;
 using std::inserter;
+using std::sort;
 
 /**
  * @brief Engine Default constructor for class Engine
@@ -16,9 +17,11 @@ Engine::Engine()
  * @param theMesh Mesh sent by communicator for computing interest points
  * @param numRings Number of rings to be considered for the computation of neighbourhood
  * @param k Constant for Harris operator computation (Equation 3 in paper)
+ * @param percentageOfPoints is a double indicating how many points should be considered as interest points
+ * @param selectionMode is a string defining the type of selection for the interest points
  * @return vector of integers with indixes of vertexes that are of interest
  */
-vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k)
+vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k, double percentageOfPoints, string selectionMode)
 {
     Engine computations = Engine();
     MatrixXd vertexes = computations.getVertexesFromMesh(theMesh);
@@ -54,7 +57,7 @@ vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k)
         harrisValues(iVertex) = harrisOperator;
     }
 
-    //Make pre - selection of interest points
+    //Make pre - selection of interest pointsd
     set <int> preSelected;
     bool discard(false);
     //Pre-selection of points
@@ -79,6 +82,7 @@ vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k)
             preSelected.insert(iVertex);
         }
     }
+
     //Convert set to VectorXi
     int numPreselected = preSelected.size();
     VectorXi preSelectedVertexes(numPreselected);
@@ -89,7 +93,56 @@ vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k)
         ctrlVar1++;
     }
 
-    //Here, select interest points according to highest harris value and clustering (we have to receive another variable in this function)
+    //Get vector with harris values
+    VectorXd preSelectedHarrisValues(numPreselected);
+    for(int iPre = 0; iPre < numPreselected; iPre++ )
+    {
+        preSelectedHarrisValues(iPre) = harrisValues(preSelectedVertexes(iPre));
+    }
+
+    vector <int> preSelectedSorted;
+
+    double maxi(0);
+    for(int iIP = 0; iIP < preSelectedVertexes.size(); iIP++)
+    {
+        maxi = preSelectedHarrisValues.maxCoeff();
+        for(int i=0; i<preSelectedVertexes.size(); i++)
+        {
+            if(abs(maxi-preSelectedHarrisValues(i))<0.00001)
+            {
+                preSelectedSorted.push_back(preSelectedVertexes(i));
+                preSelectedHarrisValues(i) = 0;
+                break;
+            }
+        }
+
+    }
+
+    if(selectionMode == "FRACTION")
+    {
+        //Selection according to points with highest Harris response
+        int numPointsToChoose = int(percentageOfPoints*numVertexes);
+        if(numPointsToChoose>preSelectedVertexes.size() || numPointsToChoose == 0)
+        {
+            numPointsToChoose = preSelectedVertexes.size();
+        }
+        vector<int> * interestPoints = new vector<int>;
+
+        for(int i=0; i<numPointsToChoose; i++)
+        {
+            interestPoints->push_back(preSelectedSorted.at(i));
+        }
+        return interestPoints;
+    }
+    else if(selectionMode == "CLUSTERING")
+    {
+        //Here implement clustering
+    }
+    else
+    {
+        return NULL;
+    }
+
 
     return NULL;
 }
