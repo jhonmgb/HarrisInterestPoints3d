@@ -1,14 +1,15 @@
-# This is a sample build configuration for C++ – Make.
-# Check our guides at https://confluence.atlassian.com/x/5Q4SMw for more examples.
-# Only use spaces to indent your .yml configuration.
-# -----
-# You can specify a custom docker image from Docker Hub as your build environment.
-image: gcc:6.1
+#Using custom docker image with QT 5.4 configured
+image: rabits/qt:5.4-desktop
 
 pipelines:
   default:
     - step:
-        script: # Modify the commands below to build your repository.
-          - ./configure
+        script:
+          - echo 'C++ Compiler Version'
+          - g++ --version
+          - echo 'QMake version'
+          - qmake --version
+          - mkdir build
+          - cd build
+          - qmake ../InterestPointsDetector.pro
           - make
-          - make test

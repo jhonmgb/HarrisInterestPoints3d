@@ -23,9 +23,9 @@ void OpenGLWidget::initializeGL()
     shader = new QOpenGLShaderProgram();
 
     shader->addShaderFromSourceFile(
-        QOpenGLShader::Vertex, ":/render/vertexshader.glsl");
+        QOpenGLShader::Vertex, ":/Render/vertexshader.glsl");
     shader->addShaderFromSourceFile(
-        QOpenGLShader::Fragment, ":/render/fragmentshader.glsl");
+        QOpenGLShader::Fragment, ":/Render/fragmentshader.glsl");
     shader->bindAttributeLocation("vertex", 0);
     shader->bindAttributeLocation("normal", 1);
     shader->link();
