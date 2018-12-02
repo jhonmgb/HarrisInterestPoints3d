@@ -1,4 +1,5 @@
 #include "Engine/engine.h"
+#include <cmath>
 
 using std::set_difference;
 using std::inserter;
@@ -126,8 +127,8 @@ vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k,
         {
             numPointsToChoose = preSelectedVertexes.size();
         }
-        vector<int> * interestPoints = new vector<int>;
 
+        vector<int> * interestPoints = new vector<int>;
         for(int i=0; i<numPointsToChoose; i++)
         {
             interestPoints->push_back(preSelectedSorted.at(i));
@@ -136,7 +137,30 @@ vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k,
     }
     else if(selectionMode == "CLUSTERING")
     {
-        //Here implement clustering
+        double diagonalOftheObject;
+        diagonalOftheObject = computations.getDiagonalOfMesh( vertexes );
+        double rho = diagonalOftheObject * percentageOfPoints;
+
+        vector<int> * interestPoints = new vector<int>;
+        for( unsigned int i = 0 ; i < preSelectedSorted.size() ; i++ )
+        {
+            bool isInterstpoint = true;
+            MatrixXd candidateVertex = vertexes.row(preSelectedSorted.at(i));
+            for( unsigned int j = 0 ; j < interestPoints->size() ; j++ )
+            {
+                MatrixXd difference = candidateVertex - vertexes.row(interestPoints->at(j));
+                double distance = difference.norm();
+                if( distance < rho)
+                {
+                   isInterstpoint = false;
+                }
+            }
+            if ( isInterstpoint == true)
+            {
+                interestPoints->push_back(preSelectedSorted.at(i));
+            }
+        }
+        return interestPoints;
     }
     else
     {
@@ -199,7 +223,7 @@ VectorXi Engine::getFacesForVertex(Mesh * theMesh, int pointIndex)
 {
     vector<int> facesForVertex = theMesh->getVertex(pointIndex)->getFaces();
     VectorXi facesForThisVertex(facesForVertex.size());
-    for(int iF=0; iF<facesForVertex.size(); iF++)
+    for(unsigned int iF=0; iF<facesForVertex.size(); iF++)
     {
         facesForThisVertex(iF) = facesForVertex.at(iF);
     }
@@ -489,5 +513,31 @@ double Engine::computeHarris(MatrixXd E, double k)
     double harrisOperator = (A*B - C*C) - k*(A+B)*(A+B); //det(E) - k*(tr(E))^2
     return harrisOperator;
 }
+
+/**
+ * @brief getDiagonalOfMesh computes the diagonal lenght of the points in the mesh
+ * @param vertexes A matrix containing all the vertex of the mesh
+ * @return the distance between the lowest and the maximum point int the mesh
+ */
+double Engine::getDiagonalOfMesh(MatrixXd allVertexes)
+{
+    // Get maximum and minimum values of the objects in the mesh
+    double maxX = allVertexes.col(0).maxCoeff();
+    double minX = allVertexes.col(0).minCoeff();
+    double maxY = allVertexes.col(1).maxCoeff();
+    double minY = allVertexes.col(1).minCoeff();
+    double maxZ = allVertexes.col(2).maxCoeff();
+    double minZ = allVertexes.col(2).minCoeff();
+
+    // Calculate the distance in each axis
+    double distX = maxX - minX;
+    double distY = maxY - minY;
+    double distZ = maxZ - minZ;
+
+    // Calculate the diagonal value of the mesh points
+    double diagonal = sqrt( distX * distX + distY * distY + distZ * distZ);
+    return diagonal;
+}
+
 
 

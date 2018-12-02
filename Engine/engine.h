@@ -149,6 +149,13 @@ public:
 
     //Here select interest points according to highest Harris operator or clustering
 
+    /**
+     * @brief getDiagonalOfMesh computes the diagonal lenght of the points in the mesh
+     * @param vertexes A matrix containing all the vertex of the mesh
+     * @return the distance between the lowest and the maximum point int the mesh
+     */
+    double getDiagonalOfMesh(MatrixXd allVertexes);
+
 };
 
 #endif // ENGINE_H
