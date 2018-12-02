@@ -1,3 +1,10 @@
+/**
+ * DISCLAIMER: This source code has been adapted form the
+ * glwidget class of the Hello GL2 Example inclued in the
+ * Qt 5.11.2 package.
+ * For more information: http://doc.qt.io/qt-5/qtopengl-hellogl2-example.html
+ */
+
 #include "openglwidget.h"
 
 /**
@@ -7,13 +14,36 @@
 OpenGLWidget::OpenGLWidget(QWidget * parent) : QOpenGLWidget (parent)
 {
     shader = NULL;
+    initializePositions();
+}
+
+/**
+ * @brief initializePositions Initializes all the positions related with
+ *  the elements in the scene.
+ */
+void OpenGLWidget::initializePositions()
+{
+    lightPosition.setX(0);
+    lightPosition.setY(0);
+    lightPosition.setZ(0);
     vertexes = 0;
+    depth = 0;
+    cameraPositionX = 0;
+    cameraPositionY = 0;
+    angleX = -45.0f;
+    angleY = 45.0f;
+    angleZ = 0.0f;
+    farPlaneDistance = 0.0f;
+    proportion = 0.0f;
 }
 
 OpenGLWidget::~OpenGLWidget()
 {
 }
 
+/**
+ * @brief initializeGL Inherited. Initializes the scene.
+ */
 void OpenGLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
@@ -35,6 +65,7 @@ void OpenGLWidget::initializeGL()
     locProjection = shader->uniformLocation("projMatrix");
     locMvMatrix = shader->uniformLocation("mvMatrix");
     locNormalMatrix = shader->uniformLocation("normalMatrix");
+    locLight = shader->uniformLocation("lightPos");
 
     buffer.create();
     buffer.setUsagePattern(QOpenGLBuffer::DynamicDraw);
@@ -51,6 +82,10 @@ void OpenGLWidget::initializeGL()
     shader->release();
 }
 
+/**
+ * @brief paintGL Inherited. Draw the vertices contained in the drawing buffer,
+ *  whithin the context.
+ */
 void OpenGLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -59,13 +94,22 @@ void OpenGLWidget::paintGL()
 
     shader->bind();
     shader->setUniformValue(locProjection, projection);
-    QMatrix4x4 identity;
-    identity.setToIdentity();
-    identity.rotate(45, 0,1,0);
-    identity.rotate(-45, 1,0,0);
-    shader->setUniformValue(locMvMatrix, cameraLocation * identity);
-    QMatrix3x3 normalMatrix = identity.normalMatrix();
+    QMatrix4x4 rotationMatrix;
+    rotationMatrix.setToIdentity();
+    rotationMatrix.rotate(angleX, 1,0,0);
+    rotationMatrix.rotate(angleY, 0,1,0);
+    rotationMatrix.rotate(angleZ, 0,0,1);
+
+    cameraLocation.setToIdentity();
+
+    cameraLocation.translate(
+        cameraPositionX, cameraPositionY, (-4.0/3.0) * depth);
+    lightPosition.setZ(depth * 2);
+
+    shader->setUniformValue(locMvMatrix, cameraLocation * rotationMatrix);
+    QMatrix3x3 normalMatrix = rotationMatrix.normalMatrix();
     shader->setUniformValue(locNormalMatrix, normalMatrix);
+    shader->setUniformValue(locLight, lightPosition);
 
     glDrawArrays(GL_TRIANGLES, 0, vertexes);
 
@@ -78,6 +122,7 @@ void OpenGLWidget::paintGL()
  */
 void OpenGLWidget::drawMesh(Mesh * mesh)
 {
+    initializePositions();
     QVector3D maxVector(0.0f, 0.0f, 0.0f);
     QVector3D minVector(0.0f, 0.0f, 0.0f);
 
@@ -123,16 +168,14 @@ void OpenGLWidget::drawMesh(Mesh * mesh)
         addToData(faceVer, normal, start);
     }
 
-    float depth = calculateDepth(maxVector, minVector);
-    cameraLocation.setToIdentity();
-    cameraLocation.translate(
-        -(maxVector.x() + minVector.x()) / 2.0f,
-        -(maxVector.y() + minVector.y()) / 2.0f,
-        (-4.0/3.0) * depth);
+    depth = calculateDepth(maxVector, minVector);
+    cameraPositionX = -(maxVector.x() + minVector.x()) / 2.0f;
+    cameraPositionY = -(maxVector.y() + minVector.y()) / 2.0f;
 
-    float farPlaneDistance = maxVector.distanceToPoint(minVector);
-    projection.setToIdentity();
-    projection.perspective(90.0f, GLfloat(1000)/600, 0.01f, (4.0/3.0) * farPlaneDistance);
+    farPlaneDistance = maxVector.distanceToPoint(minVector);
+    proportion = farPlaneDistance / 360.0f;
+
+    resizeGL(this->width(), this->height());
 
     buffer.bind();
     buffer.allocate(data.constData(), data.length() * sizeof(GLfloat));
@@ -182,4 +225,89 @@ float OpenGLWidget::calculateDepth(QVector3D & max, QVector3D & min)
         }
     }
     return maxVal;
+}
+
+/**
+ * @brief wheelEvent Inherited. Controls the wheel event to zoom-in and zoom-out.
+ */
+void OpenGLWidget::wheelEvent(QWheelEvent * event)
+{
+    QPoint roll = event->angleDelta();
+    float delta = roll.y()/(8.0f * 45.0f);
+    depth += proportion * delta;
+    update();
+}
+
+/**
+ * @brief mousePressEvent Inherited. Controls the mouse press event to give the
+ *  focus to the widget and define the starting point of the drag event
+ */
+void OpenGLWidget::mousePressEvent(QMouseEvent * event)
+{
+    this->setFocus();
+    lastPosition = event->pos();
+}
+
+/**
+ * @brief mouseMoveEvent Inherited. Controls the mouse move event while dragging
+ *  the screen. Rotates the scene accordint to the mouse movement.
+ */
+void OpenGLWidget::mouseMoveEvent(QMouseEvent * event)
+{
+
+    int dx = event->x() - lastPosition.x();
+    int dy = event->y() - lastPosition.y();
+
+    if (event->buttons() & Qt::LeftButton)
+    {
+        angleX = angleX + 2 * dy;
+        angleY = angleY + 2 * dx;
+    }
+    else if (event->buttons() & Qt::RightButton)
+    {
+        angleX = angleX + 2 * dy;
+        angleZ = angleZ + 2 * dx;
+    }
+    lastPosition = event->pos();
+    update();
+}
+
+/**
+ * @brief keyPressEvent Inherited. Controls the key events. The up, down, left
+ *  and right to displace the scene along the X and Y axis.
+ */
+void OpenGLWidget::keyPressEvent(QKeyEvent * event)
+{
+    int key = event->key();
+
+    switch(key)
+    {
+        case Qt::Key_Up :
+            cameraPositionY = cameraPositionY + proportion;
+            break;
+        case Qt::Key_Down :
+            cameraPositionY  = cameraPositionY - proportion;
+            break;
+        case Qt::Key_Left:
+            cameraPositionX = cameraPositionX - proportion;
+            break;
+        case Qt::Key_Right:
+            cameraPositionX = cameraPositionX + proportion;
+            break;
+    }
+
+    update();
+}
+
+/**
+ * @brief resizeGL Inherited. Fixes the scene's aspect ratio according
+ *  to the widget size.
+ * @param w The width of the widget
+ * @param h The height of the widget.
+ */
+void OpenGLWidget::resizeGL(int w, int h)
+{
+    projection.setToIdentity();
+    projection.perspective(
+        90.0f, GLfloat(w)/h, 0.01f, (4.0/3.0) * farPlaneDistance);
 }
