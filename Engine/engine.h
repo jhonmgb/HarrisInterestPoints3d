@@ -1,4 +1,4 @@
-#include "../BasicStructures/mesh.h"
+#include "BasicStructures/mesh.h"
 #include <Eigen/Dense>
 #include <Eigen/Core>
 #include <vector>
