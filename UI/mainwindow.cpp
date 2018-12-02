@@ -223,6 +223,12 @@ void MainWindow::loadMesh()
     catch (Exception & e)
     {
         QMessageBox::critical(this, "Error", e.what());
+        return;
+    }
+    catch (exception & e)
+    {
+        QMessageBox::critical(this, "Critical Error", e.what());
+        return;
     }
     render->drawMesh(communicator->getMesh());
 
