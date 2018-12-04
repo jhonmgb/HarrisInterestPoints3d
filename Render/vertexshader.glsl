@@ -15,4 +15,5 @@ void main()
     vert = vertex.xyz;
     vertNormal = normalMatrix * normal;
     gl_Position = projMatrix * mvMatrix * vertex;
+    gl_PointSize = 10.0;
 }

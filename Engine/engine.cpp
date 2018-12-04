@@ -22,7 +22,8 @@ Engine::Engine()
  * @param selectionMode is a string defining the type of selection for the interest points
  * @return vector of integers with indixes of vertexes that are of interest
  */
-vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k, double percentageOfPoints, string selectionMode)
+vector<int> * Engine::findInterestPoints(
+    Mesh * theMesh, int numRings, double k, double percentageOfPoints, SelectionMode selectionMode)
 {
     Engine computations = Engine();
     MatrixXd vertexes = computations.getVertexesFromMesh(theMesh);
@@ -119,7 +120,7 @@ vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k,
 
     }
 
-    if(selectionMode == "FRACTION")
+    if(selectionMode == SelectionMode::FRACTION)
     {
         //Selection according to points with highest Harris response
         int numPointsToChoose = int(percentageOfPoints*numVertexes);
@@ -135,7 +136,7 @@ vector<int> * Engine::findInterestPoints(Mesh * theMesh, int numRings, double k,
         }
         return interestPoints;
     }
-    else if(selectionMode == "CLUSTERING")
+    else if(selectionMode == SelectionMode::CLUSTERING)
     {
         double diagonalOftheObject;
         diagonalOftheObject = computations.getDiagonalOfMesh( vertexes );
@@ -389,7 +390,6 @@ MatrixXd Engine::centerNeighbourhood(MatrixXd Neighbourhood , MatrixXd& Centroid
     centeredPoints = Neighbourhood - centeredPoints;
     return centeredPoints;
 }
-
 
 /**
  * @brief findBestFittingPlane:

@@ -42,10 +42,9 @@ private:
     QLineEdit * harrisParam;
     QLineEdit * rings;
     QComboBox * selectionMode;
-    QLineEdit * parameterSelection;
+    QLineEdit * percentageOfPoints;
 
     QPushButton * loadMeshButton;
-    QPushButton * renderButton;
     QPushButton * calculateInterestPoints;
 
     Communicator * communicator;
@@ -88,6 +87,8 @@ private slots:
      * @brief loadMesh loads the mesh into the Communicator.
      */
     void loadMesh();
+
+    void loadInterestPoints();
 public:
 
     // Constructor.

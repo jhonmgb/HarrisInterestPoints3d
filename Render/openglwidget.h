@@ -28,13 +28,16 @@ private:
     QVector3D lightPosition;
     QMatrix4x4 projection;
     QMatrix4x4 cameraLocation;
+    QVector<GLfloat> data;
     QOpenGLBuffer buffer;
     QPoint lastPosition;
+    int interestPoints;
     int vertexes;
     int locMvMatrix;
     int locNormalMatrix;
     int locLight;
     int locProjection;
+    int locColor;
     float depth;
     float cameraPositionX;
     float cameraPositionY;
@@ -65,6 +68,7 @@ private:
      */
     void initializePositions();
 
+    void renderInterestPointsInBuffer();
 protected:
 
     /**
@@ -122,6 +126,10 @@ public:
      * @param mesh The mesh to be rendered.
      */
     void drawMesh(Mesh * mesh);
+
+    void drawInterestPoints();
+
+    void reallocateBufferWithInteresPoints(vector<Vertex *> * interestPoints);
 };
 
 #endif
