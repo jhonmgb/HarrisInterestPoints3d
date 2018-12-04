@@ -3,6 +3,7 @@
 
 #include <QString>
 #include "BasicStructures/mesh.h"
+#include "Engine/engine.h"
 
 enum MeshType {TRIVERT, OFF};
 
@@ -12,6 +13,10 @@ private:
     // This static instance ensures that there is one and only one
     // mesh during the whole execution of the program.
     static Mesh * mesh;
+
+    Engine * engine;
+
+    void healthCheck();
 
 public:
     Communicator();
@@ -26,6 +31,14 @@ public:
      * @return a poiner to mesh
      */
     Mesh * getMesh();
+
+    void bindEngine(Engine * engine);
+
+    vector<Vertex *> * retrieveInterestPoints(
+        int numRings, double k, double percentageOfPoints, QString selectionMode);
+
+    vector<Vertex *> * convertIntPoints(vector<int>* indexes);
+
 };
 
 #endif // COMMUNICATOR_H

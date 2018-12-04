@@ -69,10 +69,8 @@ void MainWindow::initializeLoadFilesPanel()
     gridLayout->addWidget(path2, 2, 1);
     gridLayout->addWidget(openFile2, 2, 2);
 
-    renderButton = new QPushButton(QString("Renderize"));
     loadMeshButton = new QPushButton(QString("Load Mesh"));
-    gridLayout->addWidget(loadMeshButton, 3, 0, 1, 2);
-    gridLayout->addWidget(renderButton, 3, 2);
+    gridLayout->addWidget(loadMeshButton, 3, 0, 1, 3);
 
     loadFilesPanel = new QGroupBox();
     loadFilesPanel->setLayout(gridLayout);
@@ -105,13 +103,14 @@ void MainWindow::initializePropertiesPanel()
     rings = new QLineEdit();
     selectionMode = new QComboBox(this);
     selectionMode->addItem(QString("Fraction"));
-    parameterSelection = new QLineEdit();
+    selectionMode->addItem(QString("Clustering"));
+    percentageOfPoints = new QLineEdit();
 
     QFormLayout * layout = new QFormLayout();
     layout->addRow(new QLabel("Harris Param K"), harrisParam);
     layout->addRow(new QLabel("Rings"), rings);
+    layout->addRow(new QLabel("Percentage of points"), percentageOfPoints);
     layout->addRow(new QLabel("Selection mode"), selectionMode);
-    layout->addRow(new QLabel("Parameter selection"), parameterSelection);
 
     harrisParam->setValidator( new QDoubleValidator(0, 100, 2, this) );
     rings->setValidator( new QIntValidator(0, 200, this) );
@@ -120,6 +119,12 @@ void MainWindow::initializePropertiesPanel()
     layout->addRow(calculateInterestPoints);
 
     propertiesPanel->setLayout(layout);
+
+    connect(
+        calculateInterestPoints,
+        &QPushButton::clicked,
+        this,
+        &MainWindow::loadInterestPoints);
 }
 
 /**
@@ -231,5 +236,33 @@ void MainWindow::loadMesh()
         return;
     }
     render->drawMesh(communicator->getMesh());
+}
+
+void MainWindow::loadInterestPoints()
+{
+    vector<Vertex *> * intPoints;
+    try
+    {
+        int numRings = rings->text().toInt();
+        double k = harrisParam->text().toDouble();
+        double percentageOfPoints = this->percentageOfPoints->text().toDouble();
+        QString selectionMode = this->selectionMode->currentText();
+
+        intPoints =
+            communicator->retrieveInterestPoints(
+                numRings, k, percentageOfPoints, selectionMode);
+        qDebug() << "ABC";
+    }
+    catch (Exception & e)
+    {
+        QMessageBox::critical(this, "Error", e.what());
+        return;
+    }
+    catch (exception & e)
+    {
+        QMessageBox::critical(this, "Critical Error", e.what());
+        return;
+    }
+    render->reallocateBufferWithInteresPoints(intPoints);
 
 }

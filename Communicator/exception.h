@@ -7,7 +7,8 @@
 using std::string;
 using std::exception;
 
-enum ExceptionType { ERROR_WHILE_READING};
+enum ExceptionType {
+    ERROR_WHILE_READING, ERROR_WHILE_BINDING, MESH_ENGINE_NOT_BINDED, UNKNOWN_SEL_METHOD};
 
 class Exception : public exception
 {

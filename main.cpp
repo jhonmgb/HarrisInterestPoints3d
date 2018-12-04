@@ -1,5 +1,6 @@
 #include "UI/mainwindow.h"
 #include "Communicator/communicator.h"
+#include "Engine/engine.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
@@ -11,7 +12,9 @@ int main(int argc, char *argv[])
 
     QSurfaceFormat::setDefaultFormat(format);
 
+    Engine * engine = new Engine();
     Communicator * communicator = new Communicator();
+    communicator->bindEngine(engine);
     MainWindow * window = new MainWindow(communicator, 0);
     window->resize(800, 600);
     window->show();

@@ -1,3 +1,6 @@
+#ifndef ENGINE_H
+#define ENGINE_H
+
 #include "BasicStructures/mesh.h"
 #include <Eigen/Dense>
 #include <Eigen/Core>
@@ -9,8 +12,8 @@
 
 using namespace Eigen;
 
-#ifndef ENGINE_H
-#define ENGINE_H
+enum SelectionMode{FRACTION, CLUSTERING};
+
 
 /**
  * @brief The Engine class for managing all computations related to the Harris operator
@@ -29,10 +32,11 @@ public:
      * @param numRings Number of rings to be considered for the computation of neighbourhood
      * @param k Constant for Harris operator computation (Equation 3 in paper)
      * @param percentageOfPoints is a double indicating how many points should be considered as interest points
-     * @param selectionMode is a string defining the type of selection for the interest points
+     * @param selectionMode is an enumeration item defining the type of selection for the interest points
      * @return vector of integers with indixes of vertexes that are of interest
      */
-    vector<int> * findInterestPoints(Mesh * theMesh, int numRings, double k, double percentageOfPoints, string selectionMode);
+    vector<int> * findInterestPoints(
+        Mesh * theMesh, int numRings, double k, double percentageOfPoints, SelectionMode selectionMode);
 
     /**
      * @brief getVertexesFromMesh converts vector of vertexes of theMesh into an MatrixXd

@@ -6,6 +6,7 @@
  */
 
 #include "openglwidget.h"
+#include "renderutil.h"
 
 /**
  * @brief OpenGLWidget constructor
@@ -35,6 +36,7 @@ void OpenGLWidget::initializePositions()
     angleZ = 0.0f;
     farPlaneDistance = 0.0f;
     proportion = 0.0f;
+    interestPoints = 0;
 }
 
 OpenGLWidget::~OpenGLWidget()
@@ -47,7 +49,11 @@ OpenGLWidget::~OpenGLWidget()
 void OpenGLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
-    glClearColor(0, 0, 0, 1);
+    glClearColor(
+        RenderUtil::backgroundColour.x(),
+        RenderUtil::backgroundColour.y(),
+        RenderUtil::backgroundColour.z(),
+        1);
 
     //Initialize shader
     shader = new QOpenGLShaderProgram();
@@ -66,6 +72,7 @@ void OpenGLWidget::initializeGL()
     locMvMatrix = shader->uniformLocation("mvMatrix");
     locNormalMatrix = shader->uniformLocation("normalMatrix");
     locLight = shader->uniformLocation("lightPos");
+    locColor = shader->uniformLocation("currentColor");
 
     buffer.create();
     buffer.setUsagePattern(QOpenGLBuffer::DynamicDraw);
@@ -90,7 +97,7 @@ void OpenGLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
 
     shader->bind();
     shader->setUniformValue(locProjection, projection);
@@ -110,10 +117,34 @@ void OpenGLWidget::paintGL()
     QMatrix3x3 normalMatrix = rotationMatrix.normalMatrix();
     shader->setUniformValue(locNormalMatrix, normalMatrix);
     shader->setUniformValue(locLight, lightPosition);
+    shader->setUniformValue(locColor, RenderUtil::meshColour);
 
     glDrawArrays(GL_TRIANGLES, 0, vertexes);
 
+    if (interestPoints > 0)
+    {
+        renderInterestPointsInBuffer();
+    }
+
     shader->release();
+    //qDebug() << glGetError() << " ";
+}
+
+
+void OpenGLWidget::renderInterestPointsInBuffer()
+{
+    int slope = (RenderUtil::sphereLongs + 1 )*2;
+    shader->setUniformValue(locColor, RenderUtil::interestPointColour);
+    for (int i = 0; i < interestPoints; i++)
+    {
+        for (int j = 0; j < RenderUtil::sphereLats; j++)
+        {
+            glDrawArrays(
+                GL_TRIANGLE_STRIP,
+                vertexes + (j * slope) + (i * RenderUtil::sphereLats * slope),
+                slope);
+        }
+    }
 }
 
 /**
@@ -134,7 +165,7 @@ void OpenGLWidget::drawMesh(Mesh * mesh)
 
     // Creation of a vector of GLfloats where the coodinates of every vertex in the
     // mesh will be stored, along with the coordinates of its normal vector.
-    QVector<GLfloat>data(this->vertexes * coordinatesPerVertex * 2);
+    data = QVector<GLfloat>(this->vertexes * coordinatesPerVertex * 2);
 
     GLfloat * start = &data.first();
     for (int i = 0; i < faces->size(); i++)
@@ -155,13 +186,13 @@ void OpenGLWidget::drawMesh(Mesh * mesh)
             faceVer[j].setY(y);
             faceVer[j].setZ(z);
 
-            maxVector.setX(x > maxVector.x()? x : maxVector.x());
-            maxVector.setY(y > maxVector.y()? y : maxVector.y());
-            maxVector.setZ(z > maxVector.z()? z : maxVector.z());
+            maxVector.setX((x > maxVector.x())? x : maxVector.x());
+            maxVector.setY((y > maxVector.y())? y : maxVector.y());
+            maxVector.setZ((z > maxVector.z())? z : maxVector.z());
 
-            minVector.setX(x < minVector.x()? x : minVector.x());
-            minVector.setY(y < minVector.y()? y : minVector.y());
-            minVector.setZ(z < minVector.z()? z : minVector.z());
+            minVector.setX((x < minVector.x())? x : minVector.x());
+            minVector.setY((y < minVector.y())? y : minVector.y());
+            minVector.setZ((z < minVector.z())? z : minVector.z());
         }
 
         QVector3D normal = QVector3D::normal(faceVer[0], faceVer[1], faceVer[2]);
@@ -180,7 +211,39 @@ void OpenGLWidget::drawMesh(Mesh * mesh)
     buffer.bind();
     buffer.allocate(data.constData(), data.length() * sizeof(GLfloat));
     buffer.release();
+    update();
+}
 
+void OpenGLWidget::reallocateBufferWithInteresPoints(vector<Vertex *> * interestPoints)
+{
+
+    this->interestPoints = interestPoints->size();
+    QVector<GLfloat> newData = data;
+    for (Vertex * myVertex : *interestPoints)
+    {
+        int elements = 0;
+
+        QVector3D centre(
+            myVertex->getCoordinates()[0],
+            myVertex->getCoordinates()[1],
+            myVertex->getCoordinates()[2]);
+        GLfloat * elms =
+            RenderUtil::generateSphere(
+                proportion * 2.0f,
+                RenderUtil::sphereLats,
+                RenderUtil::sphereLongs,
+                elements,
+                centre);
+
+        for (int i = 0; i < elements; i++)
+        {
+            newData.push_back(elms[i]);
+        }
+    }
+
+    buffer.bind();
+    buffer.allocate(newData.constData(), newData.length() * sizeof(GLfloat));
+    buffer.release();
     update();
 }
 
@@ -295,7 +358,6 @@ void OpenGLWidget::keyPressEvent(QKeyEvent * event)
             cameraPositionX = cameraPositionX + proportion;
             break;
     }
-
     update();
 }
 
@@ -310,4 +372,41 @@ void OpenGLWidget::resizeGL(int w, int h)
     projection.setToIdentity();
     projection.perspective(
         90.0f, GLfloat(w)/h, 0.01f, (4.0/3.0) * farPlaneDistance);
+}
+
+void OpenGLWidget::drawInterestPoints()
+{
+    interestPoints = 14;
+    GLfloat floats[] =
+    {
+        -14.665700f, 14.623900f, 51.540001f,
+        2.850450f, 42.581299f, 51.009602f,
+        7.531370f, 8.660440f, 33.058601f,
+        2.978240f, 37.160999f, 66.557098f,
+        4.219920f, 22.941601f, 70.514397f,
+        4.313190f, 25.350300f, 70.067703f,
+        6.468030f, 17.576799f, 70.261002f,
+        7.736700f, 17.180799f, 69.606300f,
+        8.932300f, 16.710400f, 68.819000f,
+        6.597800f, 20.087799f, 69.988403f,
+        7.797780f, 19.681499f, 69.352997f,
+        8.912280f, 19.197701f, 68.592903f,
+        9.986520f, 16.225599f, 67.927002f,
+        11.000900f, 13.340600f, 66.990196
+    };
+
+    int sum = 0;
+    vector<Vertex*> vertexesP;
+    for (int i = 0; i < 14; i++)
+    {
+        double * coords = new double[3];
+        Vertex * vert = new Vertex();
+        coords[0] = floats[sum++];
+        coords[1] = floats[sum++];
+        coords[2] = floats[sum++];
+        vert->setCoordinates(coords);
+        vertexesP.push_back(vert);
+    }
+    reallocateBufferWithInteresPoints(&vertexesP);
+
 }

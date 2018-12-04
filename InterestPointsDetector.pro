@@ -1,4 +1,3 @@
-QT += core gui widgets opengl
 
 CONFIG += c++11
 CONFIG -= app_bundle
@@ -24,7 +23,8 @@ SOURCES += \
     Communicator/exception.cpp \
     FileManager/filemanager.cpp \
     Render/openglwidget.cpp \
-    Engine/engine.cpp
+    Engine/engine.cpp \
+    Render/renderutil.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -40,7 +40,8 @@ HEADERS += \
     Communicator/exception.h \
     FileManager/filemanager.h \
     Render/openglwidget.h \
-    Engine/engine.h
+    Engine/engine.h \
+    Render/renderutil.h
 
 DISTFILES +=
 
