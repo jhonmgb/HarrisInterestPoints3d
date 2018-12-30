@@ -1,12 +1,29 @@
 #include "renderutil.h"
 
+/**
+ * @brief RenderUtil::RenderUtil No operational constructor.
+ *  This class only contains static functions and parameters.
+ */
 RenderUtil::RenderUtil()
 {
     //NO operational constructor.
 }
 
+/**
+ * @brief RenderUtil::generateSphere function to get the coordinates that
+ *  draws an sphere in OpenGL (No GLU needed). This code is adapted from
+ *  http://www.cburch.com/cs/490/sched/feb8/
+ * @param rad the radius of the sphere.
+ * @param lats the number of latitudes.
+ * @param longs the number of longitudes.
+ * @param vtxs counter of vertexes, needed to fill the drawing buffer
+ *  accordingly.
+ * @param centre the centre where the sphere should be placed.
+ * @return array of GLfloats with the coordinates of the vertexes of the
+ *  sphere.
+ */
 GLfloat * RenderUtil::generateSphere(
-    int rad, int lats, int longs, int & vtxs, QVector3D & centre)
+    double rad, int lats, int longs, int & vtxs, QVector3D & centre)
 {
     GLfloat * elems = new GLfloat[(lats)*(longs+1) * 4 * 3];
     vtxs = 0;
@@ -57,10 +74,31 @@ GLfloat * RenderUtil::generateSphere(
     return elems;
 }
 
+/**
+ * @brief RenderUtil::backgroundColour constant representing the scene's
+ *  background colour in RGB.
+ */
 const QVector3D RenderUtil::backgroundColour = QVector3D(0.78f,0.82f,0.88f);
+
+/**
+ * @brief RenderUtil::meshColour constant representing the mesh colour in RGB.
+ */
 const QVector3D RenderUtil::meshColour = QVector3D(0.39f, 1.0f, 1.0f);
+
+/**
+ * @brief RenderUtil::interestPointColour constant representing the colour
+ *  in RGB of the interest points.
+ */
 const QVector3D RenderUtil::interestPointColour = QVector3D(1.0f, 0, 0);
 
+/**
+ * @brief RenderUtil::sphereLats constant representing the latitudes of the
+ *  spheres who draws an interest point.
+ */
 const int RenderUtil::sphereLats = 4;
-const int RenderUtil::sphereLongs = 4;
 
+/**
+ * @brief RenderUtil::sphereLats constant representing the longitudes of the
+ *  spheres who draws an interest point.
+ */
+const int RenderUtil::sphereLongs = 4;

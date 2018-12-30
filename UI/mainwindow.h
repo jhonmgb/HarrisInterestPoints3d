@@ -84,11 +84,29 @@ private slots:
     void loadFile(QAbstractButton * origin);
 
     /**
-     * @brief loadMesh loads the mesh into the Communicator.
+     * @brief loadMesh loads the mesh into the Communicator, ready for process,
+     *  and render the mesh in to the OpenGL widget.
      */
     void loadMesh();
 
+    /**
+     * @brief loadInterestPoints read the parameters defined by the user and
+     *  send a request to the communicator to calculate the interest points
+     *  of the loaded mesh.
+     */
     void loadInterestPoints();
+
+    /**
+     * @brief validateInput Validate the input parameters prior the interest
+     *  points calculation.
+     * @param rings the number of ring to consider during the interest
+     *  points calculation.
+     * @param k the harris param.
+     * @param percentage the percentage of interest points to select.
+     * @param isOk flag that indicates wheter the input fields has been filled
+     *  with numbers.
+     */
+    void validateInput(int rings, double k, double percentage, bool isOk);
 public:
 
     // Constructor.

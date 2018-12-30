@@ -56,7 +56,7 @@ private:
 
     /**
      * @brief calculateDepth calculates the right z displacement of the camara,
-     *  to display the whole mesh. The
+     *  to display the whole mesh.
      * @param max is the most outer-top-left point of the mesh bounding box
      * @param min is the most inner-down-right point of the mesh bounding box
      */
@@ -68,6 +68,10 @@ private:
      */
     void initializePositions();
 
+    /**
+     * @brief renderInterestPointsInBuffer draw the interest points from the
+     *  drawing buffer.
+     */
     void renderInterestPointsInBuffer();
 protected:
 
@@ -91,25 +95,26 @@ protected:
     void resizeGL(int w, int h) override;
 
     /**
-     * @brief wheelEvent Inherited. Controls the wheel event to zoom-in and zoom-out.
+     * @brief wheelEvent Inherited. Controls the wheel event to zoom-in and
+     *  zoom-out.
      */
     void wheelEvent(QWheelEvent *) override;
 
     /**
-     * @brief mousePressEvent Inherited. Controls the mouse press event to give the
-     *  focus to the widget and define the starting point of the drag event
+     * @brief mousePressEvent Inherited. Controls the mouse press event to give
+     *  the focus to the widget and define the starting point of the drag event.
      */
     void mousePressEvent(QMouseEvent *) override;
 
     /**
-     * @brief mouseMoveEvent Inherited. Controls the mouse move event while dragging
-     *  the screen. Rotates the scene accordint to the mouse movement.
+     * @brief mouseMoveEvent Inherited. Controls the mouse move event while
+     *  dragging the screen. Rotates the scene accordint to the mouse movement.
      */
     void mouseMoveEvent(QMouseEvent *) override;
 
     /**
-     * @brief keyPressEvent Inherited. Controls the key events. The up, down, left
-     *  and right to displace the scene along the X and Y axis.
+     * @brief keyPressEvent Inherited. Controls the key events. The up, down,
+     *  left and right to displace the scene along the X and Y axis.
      */
     void keyPressEvent(QKeyEvent *) override;
 
@@ -127,8 +132,11 @@ public:
      */
     void drawMesh(Mesh * mesh);
 
-    void drawInterestPoints();
-
+    /**
+     * @brief reallocateBufferWithInteresPoints create single spheres per
+     *  interest point, and add it into the drawing buffer.
+     * @param interestPoints pointer to the calculated interest points.
+     */
     void reallocateBufferWithInteresPoints(vector<Vertex *> * interestPoints);
 };
 

@@ -9,7 +9,7 @@
 #include "renderutil.h"
 
 /**
- * @brief OpenGLWidget constructor
+ * @brief OpenGLWidget::OpenGLWidget constructor
  * @param parent pointer to the parent widget.
  */
 OpenGLWidget::OpenGLWidget(QWidget * parent) : QOpenGLWidget (parent)
@@ -19,8 +19,8 @@ OpenGLWidget::OpenGLWidget(QWidget * parent) : QOpenGLWidget (parent)
 }
 
 /**
- * @brief initializePositions Initializes all the positions related with
- *  the elements in the scene.
+ * @brief OpenGLWidget::initializePositions Initializes all the positions
+ *  related with the elements in the scene.
  */
 void OpenGLWidget::initializePositions()
 {
@@ -44,7 +44,7 @@ OpenGLWidget::~OpenGLWidget()
 }
 
 /**
- * @brief initializeGL Inherited. Initializes the scene.
+ * @brief OpenGLWidget::initializeGL Inherited. Initializes the scene.
  */
 void OpenGLWidget::initializeGL()
 {
@@ -54,7 +54,6 @@ void OpenGLWidget::initializeGL()
         RenderUtil::backgroundColour.y(),
         RenderUtil::backgroundColour.z(),
         1);
-
     //Initialize shader
     shader = new QOpenGLShaderProgram();
 
@@ -90,14 +89,13 @@ void OpenGLWidget::initializeGL()
 }
 
 /**
- * @brief paintGL Inherited. Draw the vertices contained in the drawing buffer,
- *  whithin the context.
+ * @brief OpenGLWidget::paintGL Inherited. Draw the vertices contained in the
+ *  drawing buffer, whithin the context.
  */
 void OpenGLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
 
     shader->bind();
     shader->setUniformValue(locProjection, projection);
@@ -127,10 +125,12 @@ void OpenGLWidget::paintGL()
     }
 
     shader->release();
-    //qDebug() << glGetError() << " ";
 }
 
-
+/**
+ * @brief OpenGLWidget::renderInterestPointsInBuffer draw the interest points
+ *  from the drawing buffer.
+ */
 void OpenGLWidget::renderInterestPointsInBuffer()
 {
     int slope = (RenderUtil::sphereLongs + 1 )*2;
@@ -148,7 +148,8 @@ void OpenGLWidget::renderInterestPointsInBuffer()
 }
 
 /**
- * @brief drawMesh Process and render the 3D mesh in the Opengl widget.
+ * @brief OpenGLWidget::drawMesh Process and render the 3D mesh in the OpenGL
+ *  widget.
  * @param mesh The mesh to be rendered.
  */
 void OpenGLWidget::drawMesh(Mesh * mesh)
@@ -214,6 +215,11 @@ void OpenGLWidget::drawMesh(Mesh * mesh)
     update();
 }
 
+/**
+ * @brief OpenGLWidget::reallocateBufferWithInteresPoints create single spheres
+ *  per interest point, and add it into the drawing buffer.
+ * @param interestPoints pointer to the calculated interest points.
+ */
 void OpenGLWidget::reallocateBufferWithInteresPoints(vector<Vertex *> * interestPoints)
 {
 
@@ -248,9 +254,9 @@ void OpenGLWidget::reallocateBufferWithInteresPoints(vector<Vertex *> * interest
 }
 
 /**
- * @brief addToData Add a face represented by three QVector3D (And its normal
- * vectors), to a vector of QLfloats, by using a pointer to GLfloat as an
- * iterator.
+ * @brief OpenGLWidget::addToData Add a face represented by three QVector3D
+ *  (And its normal vectors), to a vector of QLfloats, by using a pointer to
+ *  GLfloat as an iterator.
  */
 void OpenGLWidget::addToData(QVector3D * vector3d, QVector3D normal, GLfloat * & start)
 {
@@ -267,8 +273,8 @@ void OpenGLWidget::addToData(QVector3D * vector3d, QVector3D normal, GLfloat * &
 }
 
 /**
- * @brief calculateDepth calculates the right z displacement of the camara,
- *  to display the whole mesh. The
+ * @brief OpenGLWidget::calculateDepth calculates the right z displacement
+ *  of the camara, to display the whole mesh.
  * @param max is the most outer-top-left point of the mesh bounding box
  * @param min is the most inner-down-right point of the mesh bounding box
  */
@@ -291,7 +297,8 @@ float OpenGLWidget::calculateDepth(QVector3D & max, QVector3D & min)
 }
 
 /**
- * @brief wheelEvent Inherited. Controls the wheel event to zoom-in and zoom-out.
+ * @brief OpenGLWidget::wheelEvent Inherited. Controls the wheel event to
+ *  zoom-in and zoom-out.
  */
 void OpenGLWidget::wheelEvent(QWheelEvent * event)
 {
@@ -302,8 +309,9 @@ void OpenGLWidget::wheelEvent(QWheelEvent * event)
 }
 
 /**
- * @brief mousePressEvent Inherited. Controls the mouse press event to give the
- *  focus to the widget and define the starting point of the drag event
+ * @brief OpenGLWidget::mousePressEvent Inherited. Controls the mouse press
+ *  event to give the focus to the widget and define the starting point of
+ *  the drag event
  */
 void OpenGLWidget::mousePressEvent(QMouseEvent * event)
 {
@@ -312,8 +320,8 @@ void OpenGLWidget::mousePressEvent(QMouseEvent * event)
 }
 
 /**
- * @brief mouseMoveEvent Inherited. Controls the mouse move event while dragging
- *  the screen. Rotates the scene accordint to the mouse movement.
+ * @brief OpenGLWidget::mouseMoveEvent Inherited. Controls the mouse move event
+ *  while dragging the screen. Rotates the scene accordint to the mouse movement.
  */
 void OpenGLWidget::mouseMoveEvent(QMouseEvent * event)
 {
@@ -336,8 +344,8 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent * event)
 }
 
 /**
- * @brief keyPressEvent Inherited. Controls the key events. The up, down, left
- *  and right to displace the scene along the X and Y axis.
+ * @brief OpenGLWidget::keyPressEvent Inherited. Controls the key events.
+ *  The up, down, left and right to displace the scene along the X and Y axis.
  */
 void OpenGLWidget::keyPressEvent(QKeyEvent * event)
 {
@@ -362,8 +370,8 @@ void OpenGLWidget::keyPressEvent(QKeyEvent * event)
 }
 
 /**
- * @brief resizeGL Inherited. Fixes the scene's aspect ratio according
- *  to the widget size.
+ * @brief OpenGLWidget::resizeGL Inherited. Fixes the scene's aspect ratio
+ *  according to the widget size.
  * @param w The width of the widget
  * @param h The height of the widget.
  */
@@ -372,41 +380,4 @@ void OpenGLWidget::resizeGL(int w, int h)
     projection.setToIdentity();
     projection.perspective(
         90.0f, GLfloat(w)/h, 0.01f, (4.0/3.0) * farPlaneDistance);
-}
-
-void OpenGLWidget::drawInterestPoints()
-{
-    interestPoints = 14;
-    GLfloat floats[] =
-    {
-        -14.665700f, 14.623900f, 51.540001f,
-        2.850450f, 42.581299f, 51.009602f,
-        7.531370f, 8.660440f, 33.058601f,
-        2.978240f, 37.160999f, 66.557098f,
-        4.219920f, 22.941601f, 70.514397f,
-        4.313190f, 25.350300f, 70.067703f,
-        6.468030f, 17.576799f, 70.261002f,
-        7.736700f, 17.180799f, 69.606300f,
-        8.932300f, 16.710400f, 68.819000f,
-        6.597800f, 20.087799f, 69.988403f,
-        7.797780f, 19.681499f, 69.352997f,
-        8.912280f, 19.197701f, 68.592903f,
-        9.986520f, 16.225599f, 67.927002f,
-        11.000900f, 13.340600f, 66.990196
-    };
-
-    int sum = 0;
-    vector<Vertex*> vertexesP;
-    for (int i = 0; i < 14; i++)
-    {
-        double * coords = new double[3];
-        Vertex * vert = new Vertex();
-        coords[0] = floats[sum++];
-        coords[1] = floats[sum++];
-        coords[2] = floats[sum++];
-        vert->setCoordinates(coords);
-        vertexesP.push_back(vert);
-    }
-    reallocateBufferWithInteresPoints(&vertexesP);
-
 }

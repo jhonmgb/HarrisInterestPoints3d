@@ -13,7 +13,6 @@ Exception::Exception(ExceptionType error, string message)
 
 Exception::~Exception()
 {
-    delete this;
 }
 
 /**
