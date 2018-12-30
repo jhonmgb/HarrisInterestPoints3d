@@ -8,8 +8,15 @@ using std::string;
 using std::exception;
 
 enum ExceptionType {
-    ERROR_WHILE_READING, ERROR_WHILE_BINDING, MESH_ENGINE_NOT_BINDED, UNKNOWN_SEL_METHOD};
+    ERROR_WHILE_READING,
+    ERROR_WHILE_BINDING,
+    MESH_ENGINE_NOT_BINDED,
+    UNKNOWN_SEL_METHOD,
+    VALIDATION_ERROR};
 
+/**
+ * @brief The Exception class manages the known exceptions within the project.
+ */
 class Exception : public exception
 {
 private:

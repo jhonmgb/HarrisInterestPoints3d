@@ -33,8 +33,8 @@ MainWindow::MainWindow(Communicator * communicator, QWidget * parent) : QMainWin
 }
 
 /**
- * @brief initializeLoadFilesPanel Initialize the panel with the UI
- *      components for loading the mesh files.
+ * @brief MainWindow::initializeLoadFilesPanel Initialize the panel with the UI
+ *  components for loading the mesh files.
  */
 void MainWindow::initializeLoadFilesPanel()
 {
@@ -78,7 +78,8 @@ void MainWindow::initializeLoadFilesPanel()
 
     connect(
         group,
-        static_cast<void (QButtonGroup::*)(QAbstractButton *)>(&QButtonGroup::buttonClicked),
+        static_cast<void (QButtonGroup::*)(QAbstractButton *)>(
+            &QButtonGroup::buttonClicked),
         this, &MainWindow::updateFilesPanel);
 
     connect(
@@ -93,8 +94,8 @@ void MainWindow::initializeLoadFilesPanel()
 }
 
 /**
- * @brief initializePropertiesPanel Initialize the panel with the UI
- *      components with the properties for calculating the interest points.
+ * @brief MainWindow::initializePropertiesPanel Initialize the panel with the UI
+ *  components with the properties for calculating the interest points.
  */
 void MainWindow::initializePropertiesPanel()
 {
@@ -112,10 +113,19 @@ void MainWindow::initializePropertiesPanel()
     layout->addRow(new QLabel("Percentage of points"), percentageOfPoints);
     layout->addRow(new QLabel("Selection mode"), selectionMode);
 
-    harrisParam->setValidator( new QDoubleValidator(0, 100, 2, this) );
+    QDoubleValidator * validator
+        = new QDoubleValidator(0, 100, 3, this);
+    validator->setNotation(QDoubleValidator::StandardNotation);
+    harrisParam->setValidator(validator);
     rings->setValidator( new QIntValidator(0, 200, this) );
+    QDoubleValidator * validatorPercentage =
+        new QDoubleValidator(0, 100, 3, this);
+    validatorPercentage->setNotation(QDoubleValidator::StandardNotation);
+    validatorPercentage->setDecimals(3);
+    percentageOfPoints->setValidator(validatorPercentage);
 
-    calculateInterestPoints = new QPushButton(QString("Calculate interest points"));
+    calculateInterestPoints =
+        new QPushButton(QString("Calculate interest points"));
     layout->addRow(calculateInterestPoints);
 
     propertiesPanel->setLayout(layout);
@@ -128,8 +138,8 @@ void MainWindow::initializePropertiesPanel()
 }
 
 /**
- * @brief updateFilesPanel updates loadFilesPanel according to the kind
- *      mesh files to load.
+ * @brief MainWindow::updateFilesPanel updates loadFilesPanel according to
+ *  the kind mesh files to load.
  * @param button a pointer to the QRadioButton choosed.
  */
 void MainWindow::updateFilesPanel(QAbstractButton * button)
@@ -156,7 +166,7 @@ void MainWindow::updateFilesPanel(QAbstractButton * button)
 }
 
 /**
- * @brief loadFile opens a QFileDialog for choosing a file.
+ * @brief MainWindow::loadFile opens a QFileDialog for choosing a file.
  * @param origin the button origin of the event.
  */
 void MainWindow::loadFile(QAbstractButton * origin)
@@ -193,7 +203,8 @@ void MainWindow::loadFile(QAbstractButton * origin)
 }
 
 /**
- * @brief initializeOglPanel Initialize the panel with the OpenGL widget.
+ * @brief MainWindow::initializeOglPanel Initialize the panel with the OpenGL
+ *  widget.
  */
 void MainWindow::initializeOglPanel()
 {
@@ -206,6 +217,10 @@ void MainWindow::initializeOglPanel()
     oglContainer->setLayout(gridLayout);
 }
 
+/**
+ * @brief MainWindow::loadMesh loads the mesh into the Communicator, ready for
+ *  process, and render the mesh in to the OpenGL widget.
+ */
 void MainWindow::loadMesh()
 {
     bool errorState = file1->isEmpty() || file1->isNull();
@@ -238,20 +253,29 @@ void MainWindow::loadMesh()
     render->drawMesh(communicator->getMesh());
 }
 
+/**
+ * @brief MainWindow::loadInterestPoints read the parameters defined by the
+ *  user and send a request to the communicator to calculate the interest points
+ *  of the loaded mesh.
+ */
 void MainWindow::loadInterestPoints()
 {
+    bool conversionOk = false;
     vector<Vertex *> * intPoints;
     try
     {
-        int numRings = rings->text().toInt();
-        double k = harrisParam->text().toDouble();
-        double percentageOfPoints = this->percentageOfPoints->text().toDouble();
+        int numRings = rings->text().toInt(&conversionOk);
+        double k = harrisParam->text().toDouble(&conversionOk);
+        double percentageOfPoints =
+            this->percentageOfPoints->text().toDouble(&conversionOk);
+
+        validateInput(numRings, k, percentageOfPoints, conversionOk);
         QString selectionMode = this->selectionMode->currentText();
 
         intPoints =
             communicator->retrieveInterestPoints(
                 numRings, k, percentageOfPoints, selectionMode);
-        qDebug() << "ABC";
+        render->reallocateBufferWithInteresPoints(intPoints);
     }
     catch (Exception & e)
     {
@@ -263,6 +287,43 @@ void MainWindow::loadInterestPoints()
         QMessageBox::critical(this, "Critical Error", e.what());
         return;
     }
-    render->reallocateBufferWithInteresPoints(intPoints);
+}
 
+/**
+ * @brief MainWindow::validateInput Validate the input parameters prior the
+ *  interest points calculation.
+ * @param rings the number of ring to consider during the interest
+ *  points calculation.
+ * @param k the harris param.
+ * @param percentage the percentage of interest points to select
+ * @param isOk flag that indicates wheter the input fields has been filled
+ *  with numbers.
+ */
+void MainWindow::validateInput(
+    int rings, double k, double percentage, bool isOk)
+{
+    if (!isOk)
+    {
+        throw Exception(
+            ExceptionType::VALIDATION_ERROR,
+            "At least one of the input parameters is empty.");
+    }
+    else if (rings <= 0 || rings > 200)
+    {
+        throw Exception(
+            ExceptionType::VALIDATION_ERROR,
+            "The number of rings should be between 0 and 200");
+    }
+    else if (percentage <= 0 || percentage > 100)
+    {
+        throw Exception(
+            ExceptionType::VALIDATION_ERROR,
+            "The percentage of interest points to select should be between 0 and 100");
+    }
+    else if (k <= 0 || k > 1)
+    {
+        throw Exception(
+            ExceptionType::VALIDATION_ERROR,
+            "The harris parameter should be a decimal number between 0 and 1");
+    }
 }

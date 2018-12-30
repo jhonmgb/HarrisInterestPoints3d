@@ -14,11 +14,14 @@ Communicator::Communicator()
 }
 
 /**
- * @brief uses the FileManager to load a mesh, reading the tri, vert OR off files.
+ * @brief Communicator::loadMesh uses the FileManager to load a mesh, reading
+ *  the tri, vert OR off files.
  */
 void Communicator::loadMesh(MeshType type, QString file1, QString file2)
 {
     FileManager manager;
+    delete mesh;
+    mesh = 0;
     if (type == MeshType::TRIVERT)
     {
         QFile * triFile = new QFile(file1);
@@ -42,11 +45,20 @@ void Communicator::loadMesh(MeshType type, QString file1, QString file2)
     }
 }
 
+/**
+ * @brief Communicator::getMesh returns a pointer to the mesh.
+ * @return a poiner to mesh
+ */
 Mesh * Communicator::getMesh()
 {
     return mesh;
 }
 
+/**
+ * @brief Communicator::bindEngine bind the communicator with the Engine that
+ *  runs the calculations.
+ * @param engine the instance of the Engine.
+ */
 void Communicator::bindEngine(Engine * engine)
 {
     if (engine == NULL)
@@ -58,6 +70,17 @@ void Communicator::bindEngine(Engine * engine)
     this->engine = engine;
 }
 
+/**
+ * @brief Communicator::retrieveInterestPoints calls the Engine and calculates
+ *  the interest points of the mesh.
+ * @param numRings the number of ring to consider during the interest
+ *  points calculation.
+ * @param k the harris param.
+ * @param percentageOfPoints the percentage of interest points to select.
+ * @param selectionMode Indicates the way the interest points will be
+ *  selected after calculation.
+ * @return The calculated interest points.
+ */
 vector<Vertex *> * Communicator::retrieveInterestPoints(
     int numRings, double k, double percentageOfPoints, QString selectionMode)
 {
@@ -80,11 +103,17 @@ vector<Vertex *> * Communicator::retrieveInterestPoints(
     }
 
     vector<int> * indexes =
-        engine->findInterestPoints(this->mesh, numRings, k, percentageOfPoints, mode);
+        engine->findInterestPoints(
+            this->mesh, numRings, k, percentageOfPoints, mode);
 
     return convertIntPoints(indexes);
 }
 
+/**
+ * @brief Communicator::healthCheck Checks wether the engine has been binded
+ *  and the mesh has been loaded, prior to start the calculation of the
+ *  interest points.
+ */
 void Communicator::healthCheck()
 {
     if (mesh == NULL || engine == NULL)
@@ -95,6 +124,12 @@ void Communicator::healthCheck()
     }
 }
 
+/**
+ * @brief Communicator::convertIntPoints retrieves the vertexes corresponding
+ *  to every index.
+ * @param indexes The indexes of the vertexes to retrieve.
+ * @return a vector with the vertexes.
+ */
 vector<Vertex *> * Communicator::convertIntPoints(vector<int>* indexes)
 {
     vector<Vertex *> * vtx = new vector<Vertex *>();
@@ -104,5 +139,6 @@ vector<Vertex *> * Communicator::convertIntPoints(vector<int>* indexes)
         vtx->push_back(mesh->getAllVertexes()->at(indexes->at(i)));
     }
 
+    delete indexes;
     return vtx;
 }
