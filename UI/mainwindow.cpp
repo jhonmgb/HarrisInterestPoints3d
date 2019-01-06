@@ -320,11 +320,11 @@ void MainWindow::validateInput(
             ExceptionType::VALIDATION_ERROR,
             "The number of rings should be between 2 and 100");
     }
-    else if (percentage <= 0 || percentage > 100)
+    else if (percentage <= 0 || percentage > 1)
     {
         throw Exception(
             ExceptionType::VALIDATION_ERROR,
-            "The percentage of interest points to select should be greater than 0 and lower or equals to 100");
+            "The percentage of interest points to select should be greater than 0 and lower or equals to 1");
     }
     else if (k <= 0 || k > 0.4)
     {
