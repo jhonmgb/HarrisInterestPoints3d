@@ -140,7 +140,7 @@ vector<int> * Engine::findInterestPoints(
     {
         double diagonalOftheObject;
         diagonalOftheObject = computations.getDiagonalOfMesh( vertexes );
-        double rho = diagonalOftheObject * percentageOfPoints;
+        double rho = diagonalOftheObject * ( 1 - percentageOfPoints );
 
         vector<int> * interestPoints = new vector<int>;
         for( unsigned int i = 0 ; i < preSelectedSorted.size() ; i++ )
