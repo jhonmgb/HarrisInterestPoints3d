@@ -113,6 +113,12 @@ void MainWindow::initializePropertiesPanel()
     layout->addRow(new QLabel("Percentage of points"), percentageOfPoints);
     layout->addRow(new QLabel("Selection mode"), selectionMode);
 
+    // Setting default values.
+
+    harrisParam->setText(QString("0.2"));
+    rings->setText(QString("3"));
+    percentageOfPoints->setText("0.5");
+
     QDoubleValidator * validator
         = new QDoubleValidator(0, 100, 3, this);
     validator->setNotation(QDoubleValidator::StandardNotation);
@@ -308,22 +314,22 @@ void MainWindow::validateInput(
             ExceptionType::VALIDATION_ERROR,
             "At least one of the input parameters is empty.");
     }
-    else if (rings <= 0 || rings > 200)
+    else if (rings <= 1 || rings > 100)
     {
         throw Exception(
             ExceptionType::VALIDATION_ERROR,
-            "The number of rings should be between 0 and 200");
+            "The number of rings should be between 2 and 100");
     }
     else if (percentage <= 0 || percentage > 100)
     {
         throw Exception(
             ExceptionType::VALIDATION_ERROR,
-            "The percentage of interest points to select should be between 0 and 100");
+            "The percentage of interest points to select should be greater than 0 and lower or equals to 100");
     }
-    else if (k <= 0 || k > 1)
+    else if (k <= 0 || k > 0.4)
     {
         throw Exception(
             ExceptionType::VALIDATION_ERROR,
-            "The harris parameter should be a decimal number between 0 and 1");
+            "The harris parameter should be a decimal number greater than 0 and lower or equals than 0.4");
     }
 }
